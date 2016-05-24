@@ -1,0 +1,8 @@
+db:
+  image: postgres:9.5
+  ports:
+    - "5432:5432"
+  volumes:
+    - /var/lib/postgresql/data
+  environment:
+    POSTGRES_USER: citus

@@ -1,0 +1,16 @@
+default: &default
+  adapter: postgresql
+  url: <%= ENV['DATABASE_URL'] %>
+  pool: 5
+  timeout: 5000
+  prepared_statements: false
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+  url: <%= (ENV['DATABASE_URL'] + '_test') if ENV['DATABASE_URL'].present?%>
+
+production:
+  <<: *default
