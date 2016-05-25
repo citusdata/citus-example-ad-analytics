@@ -393,7 +393,7 @@ ALTER SEQUENCE campaigns_id_seq OWNED BY campaigns.id;
 
 CREATE TABLE clicks (
     id uuid NOT NULL,
-    ad_id integer NOT NULL,
+    ad_id uuid NOT NULL,
     clicked_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
     cost_per_click_usd numeric(20,10),
@@ -408,7 +408,7 @@ CREATE TABLE clicks (
 
 CREATE TABLE impressions (
     id uuid NOT NULL,
-    ad_id integer NOT NULL,
+    ad_id uuid NOT NULL,
     seen_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
     cost_per_impression_usd numeric(20,10),

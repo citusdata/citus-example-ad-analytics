@@ -5,6 +5,7 @@ gem 'pg'
 
 gem 'faker'
 gem 'devise'
+gem 'pg_data_encoder', path: '~/Code/pg_data_encoder'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'

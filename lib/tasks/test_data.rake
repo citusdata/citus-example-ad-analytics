@@ -36,18 +36,22 @@ namespace :test_data do
           impression_count = rand(impression_count_range)
           user_ips = impression_count.times.map { Faker::Internet.ip_v4_address }
 
-          impression_count.times do |impression_num|
-            print 'I'
-            Impression.create! id: SecureRandom.uuid, ad_id: ad_id, seen_at: Faker::Time.between(ts_start, ts_end), site_url: Faker::Internet.url,
-                               user_ip: user_ips[impression_num], user_data: { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
-                               cost_per_impression_usd: campaign.cost_model == 'cost_per_impression' ? rand(cpi_amount_range) : nil
+          Impression.copy_from_client [:id, :ad_id, :seen_at, :site_url, :user_ip, :user_data, :cost_per_impression_usd] do |copy|
+            impression_count.times do |impression_num|
+              print 'I'
+              copy << [SecureRandom.uuid, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips[impression_num],
+                       { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
+                       campaign.cost_model == 'cost_per_impression' ? rand(cpi_amount_range) : nil]
+            end
           end
 
-          rand(click_count_range).times do
-            print 'C'
-            Click.create! id: SecureRandom.uuid, ad_id: ad_id, clicked_at: Faker::Time.between(ts_start, ts_end), site_url: Faker::Internet.url,
-                          user_ip: user_ips.sample, user_data: { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
-                          cost_per_click_usd: campaign.cost_model == 'cost_per_click' ? rand(cpc_amount_range) : nil
+          Click.copy_from_client [:id, :ad_id, :clicked_at, :site_url, :user_ip, :user_data, :cost_per_click_usd] do |copy|
+            rand(click_count_range).times do
+              print 'C'
+              copy << [SecureRandom.uuid, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips.sample,
+                       { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
+                       campaign.cost_model == 'cost_per_click' ? rand(cpc_amount_range) : nil]
+            end
           end
         end
       end
