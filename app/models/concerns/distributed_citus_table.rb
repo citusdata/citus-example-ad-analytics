@@ -50,6 +50,8 @@ module DistributedCitusTable
 
   included do
     disable_transactions
+
+    self.primary_key = 'id'
   end
 
   class_methods do
