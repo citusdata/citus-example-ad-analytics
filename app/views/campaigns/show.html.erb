@@ -26,7 +26,7 @@
               <td><%= ad.target_url %></td>
               <td><%= ad.impressions.count %></td>
               <td><%= ad.clicks.count %></td>
-              <td><%= format('%0.2f%%', ad.clicks.count / ad.impressions.count * 100) %></td>
+              <td><%= format('%0.2f%%', ad.clicks.count / ad.impressions.count.to_f * 100) %></td>
             </tr>
           <% end %>
         </table>

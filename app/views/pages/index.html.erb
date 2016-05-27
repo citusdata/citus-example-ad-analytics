@@ -27,7 +27,7 @@
               <td><%= campaign.state.titleize %></td>
               <td><%= campaign.impressions.count %></td>
               <td><%= campaign.clicks.count %></td>
-              <td><%= campaign.impressions.count > 0 ? format("%0.2f%%", campaign.clicks.count / campaign.impressions.count * 100) : '-' %></td>
+              <td><%= campaign.impressions.count > 0 ? format("%0.2f%%", campaign.clicks.count / campaign.impressions.count.to_f * 100) : '-' %></td>
               <td>
                 <div class="progress progress-xs">
                   <div class="progress-bar progress-bar-danger" style="width: 55%"></div>

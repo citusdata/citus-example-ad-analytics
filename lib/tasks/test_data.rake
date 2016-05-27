@@ -7,8 +7,8 @@ namespace :test_data do
     ts_end   = Time.now
 
     account_count_range    = 1..1 # 100..100
-    campaign_count_range   = 1..15
-    ad_count_range         = 1..5
+    campaign_count_range   = 2..15
+    ad_count_range         = 3..5
     impression_count_range = 50_000..500_000
     click_count_range      = 1..50_000
     cpi_amount_range       = rand(0.001..0.01)
@@ -32,7 +32,7 @@ namespace :test_data do
           print 'A'
 
           ad_id = SecureRandom.uuid
-          ad = Ad.create! id: ad_id, name: Faker::Hipster.sentence(3), image_url: Faker::Placeholdit.image("600x100"),
+          ad = Ad.create! id: ad_id, name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
                           target_url: Faker::Internet.url(domain_name), campaign: campaign
 
           impression_count = rand(impression_count_range)
@@ -42,8 +42,8 @@ namespace :test_data do
             impression_count.times do |impression_num|
               print 'I'
               copy << [SecureRandom.uuid, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips[impression_num],
-                       { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
-                       campaign.cost_model == 'cost_per_impression' ? rand(cpi_amount_range) : nil]
+                       { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code }, nil]
+                       #campaign.cost_model == 'cost_per_impression' ? rand(cpi_amount_range) : nil]
             end
           end
 
@@ -51,8 +51,8 @@ namespace :test_data do
             rand(click_count_range).times do
               print 'C'
               copy << [SecureRandom.uuid, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips.sample,
-                       { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
-                       campaign.cost_model == 'cost_per_click' ? rand(cpc_amount_range) : nil]
+                       { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code }, nil]
+                       #campaign.cost_model == 'cost_per_click' ? rand(cpc_amount_range) : nil]
             end
           end
         end
