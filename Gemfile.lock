@@ -4,6 +4,13 @@ GIT
   specs:
     pg_data_encoder (0.1.10)
 
+PATH
+  remote: ~/Code/pgdatagraph
+  specs:
+    pgdatagraph (0.1)
+      coffee-rails (>= 3.2.1)
+      railties (>= 3.0, < 5.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -50,6 +57,13 @@ GEM
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
     builder (3.2.2)
+    coffee-rails (4.1.1)
+      coffee-script (>= 2.2.0)
+      railties (>= 4.0.0, < 5.1.x)
+    coffee-script (2.4.1)
+      coffee-script-source
+      execjs
+    coffee-script-source (1.10.0)
     composite_primary_keys (8.1.3)
       activerecord (~> 4.2.0)
     concurrent-ruby (1.0.2)
@@ -90,6 +104,7 @@ GEM
       mini_portile2 (~> 2.0.0.rc2)
     orm_adapter (0.5.0)
     pg (0.18.4)
+    puma (3.4.0)
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
@@ -157,6 +172,8 @@ DEPENDENCIES
   jquery-rails
   pg
   pg_data_encoder!
+  pgdatagraph!
+  puma
   rails (= 4.2.6)
   sass-rails (~> 5.0)
   uglifier (>= 1.3.0)

@@ -4,6 +4,10 @@
 <div class="row">
   <div class="col-md-12">
     <div class="box">
+      <div id="stats" style="width: 99%" class="datagraph"></div>
+    </div>
+
+    <div class="box">
       <div class="box-header with-border">
         <h3 class="box-title">Last 10 Impressions</h3>
       </div>
@@ -20,7 +24,7 @@
           </tr>
           <% @ad.impressions.order('seen_at DESC').limit(10).each do |impression| %>
             <tr>
-              <td><%= impression.id[/^\w+/] %></td>
+              <td><%#= impression.id[/^\w+/] %></td>
               <td><%= impression.site_url %></td>
               <td><%= impression.user_ip %></td>
               <td><%= impression.user_data['location'] %></td>
@@ -50,7 +54,7 @@
           </tr>
           <% @ad.clicks.order('clicked_at DESC').limit(10).each do |click| %>
             <tr>
-              <td><%= click.id[/^\w+/] %></td>
+              <td><%#= click.id[/^\w+/] %></td>
               <td><%= click.site_url %></td>
               <td><%= click.user_ip %></td>
               <td><%= click.user_data['location'] %></td>
@@ -64,3 +68,16 @@
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+new PG.DataGraph("#stats.datagraph", "<%= stats_campaign_ad_path(@ad.campaign, @ad) %>", {
+  defaultDuration: 30,
+  detailSmoothing: 1,
+  overviewSmoothing: 1,
+  datePickers: [
+    { label: "last 90 days",  duration: 90 },
+    { label: "last 60 days",  duration: 60 },
+    { label: "last 30 days", duration: 30 }
+  ],
+});
+</script>

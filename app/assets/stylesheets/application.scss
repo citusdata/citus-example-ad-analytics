@@ -5,3 +5,9 @@
 
 @import "AdminLTE";
 @import "skin-black";
+
+@import "pgdatagraph";
+
+.datagraph .datagraph__datepickers .datagraph__calendar-from, .datagraph .datagraph__datepickers .datagraph__calendar-to {
+  font-family: inherit;
+}

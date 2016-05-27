@@ -19,7 +19,7 @@
             <th>Budget</th>
             <th style="width: 40px"></th>
           </tr>
-          <% Campaign.all.each do |campaign| %>
+          <% current_account.campaigns.includes(:ads).each do |campaign| %>
             <tr>
               <td><%= campaign.id %></td>
               <td><%= link_to campaign.name, campaign_path(campaign) %></td>

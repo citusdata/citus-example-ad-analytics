@@ -4,6 +4,10 @@
 <div class="row">
   <div class="col-md-12">
     <div class="box">
+      <div id="stats" style="width: 99%" class="datagraph"></div>
+    </div>
+
+    <div class="box">
       <div class="box-header with-border">
         <h3 class="box-title">All Ads</h3>
       </div>
@@ -22,7 +26,7 @@
             <tr>
               <td><%= ad.id[/^\w+/] %></td>
               <td><%= link_to ad.name, campaign_ad_path(ad.campaign, ad) %></td>
-              <td><%= image_tag ad.image_url %></td>
+              <td><%= image_tag ad.image_url, width: 300, height: 50 %></td>
               <td><%= ad.target_url %></td>
               <td><%= ad.impressions.count %></td>
               <td><%= ad.clicks.count %></td>
@@ -31,4 +35,19 @@
           <% end %>
         </table>
       </div>
+    </div>
   </div>
+</div>
+
+<script type="text/javascript">
+new PG.DataGraph("#stats.datagraph", "<%= stats_campaign_path(@campaign) %>", {
+  defaultDuration: 30,
+  detailSmoothing: 1,
+  overviewSmoothing: 1,
+  datePickers: [
+    { label: "last 90 days",  duration: 90 },
+    { label: "last 60 days",  duration: 60 },
+    { label: "last 30 days", duration: 30 }
+  ],
+});
+</script>
