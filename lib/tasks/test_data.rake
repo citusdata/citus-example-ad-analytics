@@ -6,7 +6,7 @@ namespace :test_data do
     ts_start = 6.months.ago
     ts_end   = Time.now
 
-    account_count_range    = 1..1 # 100..100
+    account_count_range    = 100..100
     campaign_count_range   = 2..15
     ad_count_range         = 3..5
     impression_count_range = 50_000..500_000
