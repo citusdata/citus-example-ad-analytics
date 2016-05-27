@@ -1,4 +1,4 @@
-module DistributedCitusTable
+module PostgresCopyFromClient
   extend ActiveSupport::Concern
 
   class CopyHandler
@@ -46,12 +46,6 @@ module DistributedCitusTable
       @encoder = PgDataEncoder::EncodeForCopy.new column_types: @column_types
       @row_count = 0
     end
-  end
-
-  included do
-    disable_transactions
-
-    self.primary_key = 'id'
   end
 
   class_methods do

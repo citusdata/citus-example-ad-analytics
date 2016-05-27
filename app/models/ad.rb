@@ -1,12 +1,8 @@
 class Ad < ActiveRecord::Base
-  include DistributedCitusTable
+  include DistributedTable
+  self.primary_key = :id
 
   belongs_to :campaign
   has_many :clicks
   has_many :impressions
-
-  def self.with_transaction_returning_status
-    puts 'YOLO'
-    yield
-  end
 end

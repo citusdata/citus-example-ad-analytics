@@ -1,7 +1,6 @@
 class Click < ActiveRecord::Base
-  include DistributedCitusTable
+  include DistributedTable
+  self.primary_keys = :id, :ad_id
 
   belongs_to :ad
-
-  # acts_as_distributed through: :ad
 end
