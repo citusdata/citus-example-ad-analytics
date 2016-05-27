@@ -9,6 +9,8 @@ class InitialTables < ActiveRecord::Migration
     create_table :accounts do |t|
       t.text :email, null: false, unique: true
       t.text :encrypted_password, null: false
+      t.text :name, null: false
+      t.text :image_url, null: false
 
       t.timestamps null: false
     end

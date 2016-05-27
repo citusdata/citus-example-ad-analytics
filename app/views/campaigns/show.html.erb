@@ -1,0 +1,34 @@
+<% content_for(:title) { "Campaign \"#{@campaign.name}\"" } %>
+<% content_for(:description) { "ID #{@campaign.id} " } %>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">All Ads</h3>
+      </div>
+      <div class="box-body">
+        <table class="table table-bordered">
+          <tr>
+            <th style="width: 10px">#</th>
+            <th>Name</th>
+            <th>Ad Image</th>
+            <th>Target URL</th>
+            <th>Impressions</th>
+            <th>Clicks</th>
+            <th>Click Through Rate</th>
+          </tr>
+          <% @campaign.ads.each do |ad| %>
+            <tr>
+              <td><%= ad.id[/^\w+/] %></td>
+              <td><%= link_to ad.name, campaign_ad_path(ad.campaign, ad) %></td>
+              <td><%= image_tag ad.image_url %></td>
+              <td><%= ad.target_url %></td>
+              <td><%= ad.impressions.count %></td>
+              <td><%= ad.clicks.count %></td>
+              <td><%= format('%0.2f%%', ad.clicks.count / ad.impressions.count * 100) %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+  </div>

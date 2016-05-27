@@ -1,10 +1,12 @@
+# rubocop:disable all
+
 namespace :test_data do
   desc 'Loads fake test data in bulk (one time, will exit when done)'
   task load_bulk: :environment do
     ts_start = 6.months.ago
     ts_end   = Time.now
 
-    account_count_range    = 1..1 #100..100
+    account_count_range    = 1..1 # 100..100
     campaign_count_range   = 1..15
     ad_count_range         = 1..5
     impression_count_range = 50_000..500_000
@@ -15,7 +17,7 @@ namespace :test_data do
     rand(account_count_range).times do
       puts ''
 
-      account = Account.create! email: Faker::Internet.email, password: Faker::Internet.password
+      account = Account.create! name: Faker::Name.name, email: Faker::Internet.email, password: Faker::Internet.password, image_url: Faker::Avatar.image
 
       rand(campaign_count_range).times do
         print 'C'

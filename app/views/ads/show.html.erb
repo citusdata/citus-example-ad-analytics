@@ -1,0 +1,66 @@
+<% content_for(:title) { "Ad \"#{@ad.name}\"" } %>
+<% content_for(:description) { "ID #{@ad.id}" } %>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Last 10 Impressions</h3>
+      </div>
+      <div class="box-body">
+        <table class="table table-bordered">
+          <tr>
+            <th style="width: 10px">#</th>
+            <th>Site URL</th>
+            <th>IP</th>
+            <th>Location</th>
+            <th>Mobile?</th>
+            <th>Seen At</th>
+            <th>Cost Per Impression</th>
+          </tr>
+          <% @ad.impressions.order('seen_at DESC').limit(10).each do |impression| %>
+            <tr>
+              <td><%= impression.id[/^\w+/] %></td>
+              <td><%= impression.site_url %></td>
+              <td><%= impression.user_ip %></td>
+              <td><%= impression.user_data['location'] %></td>
+              <td><%= impression.user_data['is_mobile'] ? 'Yes' : 'No' %></td>
+              <td><%= impression.seen_at %></td>
+              <td><%= @ad.campaign.cost_model == 'cost_per_impression' ? impression.cost_per_impression_usd : 'n/a' %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">Last 10 Clicks</h3>
+      </div>
+      <div class="box-body">
+        <table class="table table-bordered">
+          <tr>
+            <th style="width: 10px">#</th>
+            <th>Site URL</th>
+            <th>IP</th>
+            <th>Location</th>
+            <th>Mobile?</th>
+            <th>Seen At</th>
+            <th>Cost Per Click</th>
+          </tr>
+          <% @ad.clicks.order('clicked_at DESC').limit(10).each do |click| %>
+            <tr>
+              <td><%= click.id[/^\w+/] %></td>
+              <td><%= click.site_url %></td>
+              <td><%= click.user_ip %></td>
+              <td><%= click.user_data['location'] %></td>
+              <td><%= click.user_data['is_mobile'] ? 'Yes' : 'No' %></td>
+              <td><%= click.clicked_at %></td>
+              <td><%= @ad.campaign.cost_model == 'cost_per_click' ? click.cost_per_click_usd : 'n/a' %></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

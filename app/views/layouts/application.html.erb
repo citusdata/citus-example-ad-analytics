@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>CitusExampleAdAnalytics</title>
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <title>Citus Ad Analytics - <%= content_for :title %></title>
+  <%= stylesheet_link_tag    'application', media: 'all' %>
+  <%= javascript_include_tag 'application' %>
   <%= csrf_meta_tags %>
 </head>
-<body>
+<body class="hold-transition skin-black sidebar-mini">
+  <div class="wrapper">
+    <%= render 'layouts/navigation' %>
 
-<%= yield %>
+    <div class="content-wrapper">
+      <section class="content-header">
+        <h1>
+          <%= content_for :title %>
+          <small><%= content_for :description %></small>
+        </h1>
+      </section>
 
+      <section class="content">
+        <%= yield %>
+      </section>
+    </div>
+    <%= render 'layouts/footer' %>
+  </div>
 </body>
 </html>

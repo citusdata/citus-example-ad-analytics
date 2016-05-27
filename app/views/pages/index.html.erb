@@ -1,0 +1,41 @@
+<% content_for(:title) { "All Campaigns" } %>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="box">
+      <div class="box-header with-border">
+        <h3 class="box-title">All Campaigns</h3>
+      </div>
+      <div class="box-body">
+        <table class="table table-bordered">
+          <tr>
+            <th style="width: 10px">#</th>
+            <th>Name</th>
+            <th>Cost Model</th>
+            <th>State</th>
+            <th>Impressions</th>
+            <th>Clicks</th>
+            <th>CTR %</th>
+            <th>Budget</th>
+            <th style="width: 40px"></th>
+          </tr>
+          <% Campaign.all.each do |campaign| %>
+            <tr>
+              <td><%= campaign.id %></td>
+              <td><%= link_to campaign.name, campaign_path(campaign) %></td>
+              <td><%= campaign.cost_model.titleize %></td>
+              <td><%= campaign.state.titleize %></td>
+              <td><%= campaign.impressions.count %></td>
+              <td><%= campaign.clicks.count %></td>
+              <td><%= campaign.impressions.count > 0 ? format("%0.2f%%", campaign.clicks.count / campaign.impressions.count * 100) : '-' %></td>
+              <td>
+                <div class="progress progress-xs">
+                  <div class="progress-bar progress-bar-danger" style="width: 55%"></div>
+                </div>
+              </td>
+              <td><span class="badge bg-red">55%</span></td>
+            </tr>
+          <% end %>
+        </table>
+      </div>
+  </div>

@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 9.5.3
--- Dumped by pg_dump version 9.5.2
+-- Dumped by pg_dump version 9.5.0
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -311,6 +311,8 @@ CREATE TABLE accounts (
     id integer NOT NULL,
     email text NOT NULL,
     encrypted_password text NOT NULL,
+    name text NOT NULL,
+    image_url text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );

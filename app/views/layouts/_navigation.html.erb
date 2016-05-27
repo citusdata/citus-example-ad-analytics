@@ -1,0 +1,73 @@
+<header class="main-header">
+  <a href="/" class="logo">
+    <span class="logo-mini"><b>C</b></span>
+    <span class="logo-lg"><b>Citus</b> Ad Analytics</span>
+  </a>
+
+  <nav class="navbar navbar-static-top" role="navigation">
+    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+      <span class="sr-only">Toggle navigation</span>
+    </a>
+    <div class="navbar-custom-menu">
+      <ul class="nav navbar-nav">
+        <li class="dropdown notifications-menu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-bell-o"></i>
+            <span class="label label-warning">1</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li class="header">You have 1 notification</li>
+            <li>
+              <ul class="menu">
+                <li>
+                  <a href="#">
+                    <i class="fa fa-book text-aqua"></i> New Weekly Report available
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="footer"><a href="#">View all</a></li>
+          </ul>
+        </li>
+        <li>
+          <a href="#"><i class="fa fa-sign-out"></i> Sign Out</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+<aside class="main-sidebar">
+  <section class="sidebar">
+    <div class="user-panel">
+      <div class="pull-left image">
+        <%= image_tag current_account.image_url, class: 'img-circle', style: 'background-color: white' %>
+      </div>
+      <div class="pull-left info">
+        <p><%= current_account.name %></p>
+        <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+      </div>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li class="header">HEADER</li>
+      <li class="active"><a href="/"><i class="fa fa-bullseye"></i> <span>All Campaigns</span></a></li>
+      <% Campaign.all.each do |campaign| %>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-bar-chart"></i>
+            <span>Campaign "<%= campaign.name.truncate(10) %>"</span>
+            <i class="fa fa-angle-left pull-right"></i>
+          </a>
+          <ul class="treeview-menu">
+            <li><%= link_to 'Manage Campaign', campaign_path(campaign) %></li>
+            <% campaign.ads.each do |ad| %>
+              <li>
+                <%= link_to "Ad \"#{ad.name.truncate(30)}\"", campaign_ad_path(ad.campaign, ad) %>
+              </li>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+    </ul>
+  </section>
+</aside>
