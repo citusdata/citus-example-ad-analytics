@@ -14,7 +14,7 @@ gem 'uglifier', '>= 1.3.0'
 gem 'bootstrap-sass'
 gem 'jquery-rails'
 gem 'font-awesome-rails'
-gem 'pgdatagraph', path: '~/Code/pgdatagraph'
+gem 'pgdatagraph', github: 'lfittl/pgdatagraph'
 
 group :development, :test do
   gem 'dotenv-rails'

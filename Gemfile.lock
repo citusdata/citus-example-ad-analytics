@@ -4,8 +4,9 @@ GIT
   specs:
     pg_data_encoder (0.1.10)
 
-PATH
-  remote: ~/Code/pgdatagraph
+GIT
+  remote: git://github.com/lfittl/pgdatagraph.git
+  revision: b8c9ed796640ade2db5bb81c7fdc642b014fce5a
   specs:
     pgdatagraph (0.1)
       coffee-rails (>= 3.2.1)
