@@ -3,7 +3,7 @@
 --
 
 -- Dumped from database version 9.5.3
--- Dumped by pg_dump version 9.5.0
+-- Dumped by pg_dump version 9.5.2
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -299,6 +299,177 @@ CREATE TYPE campaign_state AS ENUM (
 );
 
 
+--
+-- Name: citus_close_dblink(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION citus_close_dblink() RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  PERFORM dblink_disconnect(connname)
+  FROM citus_placements p JOIN unnest(dblink_get_connections()) conn ON (p.connname = conn);
+
+  PERFORM dblink_disconnect(connname)
+  FROM citus_workers w JOIN unnest(dblink_get_connections()) conn ON (w.connname = conn);
+END;
+$$;
+
+
+--
+-- Name: citus_run_on_all_placements(regclass, text, boolean); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION citus_run_on_all_placements(table_name regclass, command text, parallel boolean DEFAULT false, OUT nodename text, OUT nodeport integer, OUT shardid bigint, OUT success boolean, OUT result text) RETURNS SETOF record
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  placement citus_placements%rowtype;
+BEGIN
+  PERFORM dblink_connect(connname, connstring)
+  FROM citus_placements p LEFT JOIN unnest(dblink_get_connections()) conn ON (p.connname = conn)
+  WHERE tablename = table_name AND conn IS NULL;
+
+  IF parallel THEN
+    PERFORM dblink_send_query(connname, format(command, shardname, shardname, shardname))
+    FROM citus_placements WHERE tablename = table_name;
+  END IF;
+
+  FOR placement IN 
+    SELECT * FROM citus_placements WHERE tablename = table_name
+  LOOP
+
+    IF NOT parallel THEN 
+      PERFORM dblink_send_query(placement.connname, format(command,
+                                placement.shardname,
+                                placement.shardname,
+                                placement.shardname));
+    END IF;
+
+    LOOP
+      BEGIN
+        RETURN QUERY
+        SELECT placement.nodename, placement.nodeport, placement.shardid, true, res
+        FROM dblink_get_result(placement.connname) AS r(res text);
+
+        EXIT WHEN NOT FOUND;
+      EXCEPTION WHEN others THEN
+        RETURN QUERY
+        SELECT placement.nodename, placement.nodeport, placement.shardid, false, SQLERRM;
+      END;
+    END LOOP;
+
+    PERFORM FROM dblink_get_result(placement.connname, false) AS r(res text);
+  END LOOP;
+
+END;
+$$;
+
+
+--
+-- Name: citus_run_on_all_workers(text, boolean); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION citus_run_on_all_workers(command text, parallel boolean DEFAULT true, OUT nodename text, OUT nodeport integer, OUT success boolean, OUT result text) RETURNS SETOF record
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  worker citus_workers%rowtype;
+BEGIN
+  PERFORM dblink_connect(connname, connstring)
+  FROM citus_workers w LEFT JOIN unnest(dblink_get_connections()) conn ON (w.connname = conn)
+  WHERE conn IS NULL;
+
+  IF parallel THEN
+    PERFORM dblink_send_query(connname, command)
+    FROM citus_workers;
+  END IF;
+
+  FOR worker IN
+    SELECT * FROM citus_workers
+  LOOP
+    IF NOT parallel THEN 
+      PERFORM dblink_send_query(worker.connname, command);
+    END IF;
+
+    LOOP
+      BEGIN
+        RETURN QUERY
+        SELECT worker.nodename, worker.nodeport, true, res
+        FROM dblink_get_result(worker.connname) AS r(res text);
+
+        EXIT WHEN NOT FOUND;
+      EXCEPTION WHEN others THEN
+        RETURN QUERY SELECT worker.nodename, worker.nodeport, false, SQLERRM;
+      END;
+    END LOOP;
+
+    PERFORM FROM dblink_get_result(worker.connname, false) AS r(res text);
+  END LOOP;
+END;
+$$;
+
+
+--
+-- Name: citus_run_on_shards(regclass, text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION citus_run_on_shards(table_name regclass, command text, OUT shardid bigint, OUT success boolean, OUT result text) RETURNS SETOF record
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  shard citus_shards%rowtype;
+BEGIN
+  PERFORM dblink_connect(connname[1], connstring[1])
+  FROM citus_shards s LEFT JOIN unnest(dblink_get_connections()) conn ON (s.connname[1] = conn)
+  WHERE tablename = table_name AND conn IS NULL;
+
+  IF parallel THEN
+    PERFORM dblink_send_query(connname[1], format(command, shardname, shardname, shardname))
+    FROM citus_shards WHERE tablename = table_name;
+  END IF;
+
+  FOR shard IN
+    SELECT * FROM citus_shards WHERE tablename = table_name
+  LOOP
+    IF NOT parallel THEN
+      PERFORM dblink_send_query(shard.connname[1], format(command,
+                                shard.shardname,
+                                shard.shardname,
+                                shard.shardname));
+    END IF;
+
+    LOOP
+      BEGIN
+        RETURN QUERY
+        SELECT shard.shardid, true, res
+        FROM dblink_get_result(shard.connname[1], false) AS r(res text);
+
+        EXIT WHEN NOT FOUND;
+      EXCEPTION WHEN others THEN
+        RETURN QUERY
+        SELECT shard.shardid, false, SQLERRM;
+      END;
+    END LOOP;
+
+    PERFORM FROM dblink_get_result(shard.connname[1], false) AS r(res text);
+  END LOOP;
+
+END;
+$$;
+
+
+--
+-- Name: citus_shard_name(regclass, bigint); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION citus_shard_name(table_name regclass, shard_id bigint) RETURNS text
+    LANGUAGE sql
+    AS $$
+  SELECT table_name||'_'||shard_id;
+$$;
+
+
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -390,6 +561,56 @@ ALTER SEQUENCE campaigns_id_seq OWNED BY campaigns.id;
 
 
 --
+-- Name: citus_placements; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW citus_placements AS
+ SELECT (pg_dist_shard.logicalrelid)::regclass AS tablename,
+    pg_dist_shard.shardid,
+    citus_shard_name((pg_dist_shard.logicalrelid)::regclass, pg_dist_shard.shardid) AS shardname,
+    pg_dist_shard_placement.nodename,
+    (pg_dist_shard_placement.nodeport)::integer AS nodeport,
+    format('%s/%s/%s'::text, pg_dist_shard_placement.nodename, pg_dist_shard_placement.nodeport, pg_dist_shard.shardid) AS connname,
+    format('host=%s port=%s dbname=%s'::text, pg_dist_shard_placement.nodename, pg_dist_shard_placement.nodeport, current_database()) AS connstring
+   FROM (pg_dist_shard
+     JOIN pg_dist_shard_placement USING (shardid))
+  WHERE (pg_dist_shard_placement.shardstate = 1)
+  ORDER BY pg_dist_shard.logicalrelid, pg_dist_shard.shardid, pg_dist_shard_placement.nodename, ((pg_dist_shard_placement.nodeport)::integer);
+
+
+--
+-- Name: citus_shards; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW citus_shards AS
+ SELECT (pg_dist_shard.logicalrelid)::regclass AS tablename,
+    pg_dist_shard.shardid,
+    citus_shard_name((pg_dist_shard.logicalrelid)::regclass, pg_dist_shard.shardid) AS shardname,
+    array_agg(pg_dist_shard_placement.nodename) AS nodenames,
+    array_agg(pg_dist_shard_placement.nodeport) AS nodeports,
+    array_agg(format('%s/%s/%s'::text, pg_dist_shard_placement.nodename, pg_dist_shard_placement.nodeport, pg_dist_shard.shardid)) AS connname,
+    array_agg(format('host=%s port=%s dbname=%s'::text, pg_dist_shard_placement.nodename, pg_dist_shard_placement.nodeport, current_database())) AS connstring
+   FROM (pg_dist_shard
+     LEFT JOIN pg_dist_shard_placement USING (shardid))
+  WHERE (pg_dist_shard_placement.shardstate = 1)
+  GROUP BY pg_dist_shard.logicalrelid, pg_dist_shard.shardid
+  ORDER BY pg_dist_shard.logicalrelid, pg_dist_shard.shardid;
+
+
+--
+-- Name: citus_workers; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW citus_workers AS
+ SELECT master_get_active_worker_nodes.node_name AS nodename,
+    (master_get_active_worker_nodes.node_port)::integer AS nodeport,
+    format('%s/%s'::text, master_get_active_worker_nodes.node_name, master_get_active_worker_nodes.node_port) AS connname,
+    format('host=%s port=%s dbname=%s'::text, master_get_active_worker_nodes.node_name, master_get_active_worker_nodes.node_port, current_database()) AS connstring
+   FROM master_get_active_worker_nodes() master_get_active_worker_nodes(node_name, node_port)
+  ORDER BY master_get_active_worker_nodes.node_name, master_get_active_worker_nodes.node_port;
+
+
+--
 -- Name: clicks; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -456,6 +677,20 @@ ALTER TABLE ONLY accounts
 
 ALTER TABLE ONLY campaigns
     ADD CONSTRAINT campaigns_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_clicks_on_ad_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_clicks_on_ad_id ON clicks USING btree (ad_id);
+
+
+--
+-- Name: index_impressions_on_ad_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impressions_on_ad_id ON impressions USING btree (ad_id);
 
 
 --

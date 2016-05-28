@@ -41,7 +41,7 @@ class InitialTables < ActiveRecord::Migration
 
     create_table :impressions, id: false do |t|
       t.uuid :id, null: false
-      t.uuid :ad_id, null: false
+      t.uuid :ad_id, null: false, index: true
       t.timestamp :seen_at, null: false
 
       t.text :site_url, null: false
@@ -53,7 +53,7 @@ class InitialTables < ActiveRecord::Migration
 
     create_table :clicks, id: false do |t|
       t.uuid :id, null: false
-      t.uuid :ad_id, null: false
+      t.uuid :ad_id, null: false, index: true
       t.timestamp :clicked_at, null: false
 
       t.text :site_url, null: false

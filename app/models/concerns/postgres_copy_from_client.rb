@@ -2,7 +2,7 @@ module PostgresCopyFromClient
   extend ActiveSupport::Concern
 
   class CopyHandler
-    def initialize(columns:, model_class:, batch_size: 500)
+    def initialize(columns:, model_class:, batch_size: 50_000)
       @columns      = columns
       @model_class  = model_class
       @connection   = model_class.connection.raw_connection
