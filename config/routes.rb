@@ -3,12 +3,12 @@ Rails.application.routes.draw do
 
   resources :campaigns do
     member do
-      get :stats
+      get :data
     end
 
     resources :ads do
       member do
-        get :stats
+        get :data
       end
     end
   end

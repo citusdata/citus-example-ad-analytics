@@ -3,7 +3,7 @@ class AdsController < ApplicationController
     @ad = Ad.find(params[:id])
   end
 
-  def stats
+  def data
     @ad = Ad.find(params[:id])
 
     start_ts = Time.at(params['start'].to_i).utc.beginning_of_day

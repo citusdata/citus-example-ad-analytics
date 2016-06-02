@@ -6,7 +6,7 @@ class CampaignsController < ApplicationController
     @campaign = Campaign.find(params[:id])
   end
 
-  def stats
+  def data
     @campaign = Campaign.find(params[:id])
 
     start_ts = Time.at(params['start'].to_i).utc.beginning_of_day
