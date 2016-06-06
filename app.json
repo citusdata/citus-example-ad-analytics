@@ -3,5 +3,8 @@
   "description": "Reference App for using Citus for Ad Analytics, based on Ruby on Rails.",
   "repository": "https://github.com/citusdata/citus-example-ad-analytics",
   "logo": "https://www.citusdata.com/sites/default/files/logo_0_0.png",
-  "keywords": ["rails", "postgresql", "citus", "distributed", "ads", "example"]
+  "keywords": ["rails", "postgresql", "citus", "distributed", "ads", "example"],
+  "DATABASE_URL": {
+    "description": "The Full URL of your Citus Cloud database, you can find this on the formation detail page (it starts with postgres://...).",
+  },
 }
