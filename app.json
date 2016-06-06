@@ -9,5 +9,8 @@
       "description": "The Full URL of your Citus Cloud database, you can find this on the formation detail page (it starts with postgres://...).",
       "required": true
     }
+  },
+  "scripts": {
+    "postdeploy": "bundle exec rake db:migrate"
   }
 }
