@@ -21,8 +21,9 @@ We use `ad_id` as the common shard key for the hash distribution, in order to ha
 2. Provision a new formation of servers (they are billed hourly), a small one will suffice for testing
 3. On the formation detail page, wait until the cluster is configured, then click *Show Full URL* and copy it to your clipboard
 4. [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/citusdata/citus-example-ad-analytics) and enter the URL from your clipboard as DATABASE_URL
-5. Run `heroku run rake db:migrate` followed by `heroku run:detached rake test_data:load_bulk` (the latter will run in the background and take a while, generating data for testing)
+5. Run `heroku run:detached rake test_data:load_bulk` to start loading data - this will work in the background and take a while
 
+Note: If you get an error like "could not find the source blob" on Heroku deploy, just click the Deploy button again.
 
 ## LICENSE
 
