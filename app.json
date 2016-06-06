@@ -1,0 +1,7 @@
+{
+  "name": "Citus Example: Ad Analytics",
+  "description": "Reference App for using Citus for Ad Analytics, based on Ruby on Rails.",
+  "repository": "https://github.com/citusdata/citus-example-ad-analytics",
+  "logo": "https://www.citusdata.com/sites/default/files/logo_0_0.png",
+  "keywords": ["rails", "postgresql", "citus", "distributed", "ads", "example"]
+}
