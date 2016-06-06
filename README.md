@@ -11,7 +11,7 @@ You can see the deployed version at http://citus-example-ad-analytics.herokuapp.
 1. Signup for a Citus Cloud account: https://console.citusdata.com/users/sign_up
 2. Provision a new formation of servers (they are billed hourly), a small one is good for testing
 3. On the formation detail page, wait until the cluster is configured, then click *Show Full URL* and copy it to your clipboard<br>
-<img src="http://f.cl.ly/items/13453P1H3g3o19272S0e/Screen%20Shot%202016-06-05%20at%209.51.05%20PM.png" width=600" />
+<img src="http://f.cl.ly/items/13453P1H3g3o19272S0e/Screen%20Shot%202016-06-05%20at%209.51.05%20PM.png" width=400" />
 4. Click the "Deploy to Heroku" button and enter the URL from your clipboard as `DATABASE_URL`:<br>
 <img src="http://f.cl.ly/items/071U2k270Q3y0u0G1V1q/Screen%20Shot%202016-06-06%20at%2012.24.54%20AM.png" width="400" />
 5. Run `heroku run:detached rake test_data:load_bulk` to load sample data - this will take a while
