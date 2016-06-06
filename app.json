@@ -5,6 +5,6 @@
   "logo": "https://www.citusdata.com/sites/default/files/logo_0_0.png",
   "keywords": ["rails", "postgresql", "citus", "distributed", "ads", "example"],
   "DATABASE_URL": {
-    "description": "The Full URL of your Citus Cloud database, you can find this on the formation detail page (it starts with postgres://...).",
-  },
+    "description": "The Full URL of your Citus Cloud database, you can find this on the formation detail page (it starts with postgres://...)."
+  }
 }
