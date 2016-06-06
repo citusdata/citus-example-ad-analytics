@@ -14,7 +14,6 @@
       <div class="box-body">
         <table class="table table-bordered">
           <tr>
-            <th style="width: 10px">#</th>
             <th>Name</th>
             <th>Ad Image</th>
             <th>Target URL</th>
@@ -24,13 +23,12 @@
           </tr>
           <% @campaign.ads.each do |ad| %>
             <tr>
-              <td><%= ad.id[/^\w+/] %></td>
               <td><%= link_to ad.name, campaign_ad_path(ad.campaign, ad) %></td>
               <td><%= image_tag ad.image_url, width: 300, height: 50 %></td>
               <td><%= ad.target_url %></td>
-              <td><%= ad.impressions.count %></td>
-              <td><%= ad.clicks.count %></td>
-              <td><%= format('%0.2f%%', ad.clicks.count / ad.impressions.count.to_f * 100) %></td>
+              <td><%= @impressions_by_ad[ad.id] %></td>
+              <td><%= (@clicks_by_ad[ad.id] || 0) %></td>
+              <td><%= format('%0.2f%%', (@clicks_by_ad[ad.id] || 0) / @impressions_by_ad[ad.id].to_f * 100) %></td>
             </tr>
           <% end %>
         </table>

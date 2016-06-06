@@ -19,15 +19,15 @@
             <th>Budget</th>
             <th style="width: 40px"></th>
           </tr>
-          <% current_account.campaigns.includes(:ads).each do |campaign| %>
+          <% @campaigns.each do |campaign| %>
             <tr>
               <td><%= campaign.id %></td>
               <td><%= link_to campaign.name, campaign_path(campaign) %></td>
               <td><%= campaign.cost_model.titleize %></td>
               <td><%= campaign.state.titleize %></td>
-              <td><%= campaign.impressions.count %></td>
-              <td><%= campaign.clicks.count %></td>
-              <td><%= campaign.impressions.count > 0 ? format("%0.2f%%", campaign.clicks.count / campaign.impressions.count.to_f * 100) : '-' %></td>
+              <td><%= @impressions_by_campaign[campaign.id] %></td>
+              <td><%= @clicks_by_campaign[campaign.id] %></td>
+              <td><%= @impressions_by_campaign[campaign.id] > 0 ? format("%0.2f%%", @clicks_by_campaign[campaign.id] / @impressions_by_campaign[campaign.id].to_f * 100) : '-' %></td>
               <td>
                 <div class="progress progress-xs">
                   <div class="progress-bar progress-bar-danger" style="width: 55%"></div>

@@ -51,7 +51,7 @@
     <ul class="sidebar-menu">
       <li class="header">HEADER</li>
       <li class="active"><a href="/"><i class="fa fa-bullseye"></i> <span>All Campaigns</span></a></li>
-      <% current_account.campaigns.each do |campaign| %>
+      <% current_account.campaigns.includes(:ads).each do |campaign| %>
         <li class="treeview">
           <a href="#">
             <i class="fa fa-bar-chart"></i>

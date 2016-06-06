@@ -62,11 +62,10 @@ namespace :test_data do
         rand(ad_count_range).times do
           print 'A'
 
-          ad_id = SecureRandom.uuid
-          ad = Ad.create! id: ad_id, name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
+          ad = Ad.create! name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
                           target_url: Faker::Internet.url(domain_name), campaign: campaign
 
-          generate_fake_data_for_ad ad_id,
+          generate_fake_data_for_ad ad.id,
                                     impression_count: rand(impression_count_range),
                                     click_count: rand(click_count_range),
                                     ts_start: ts_start,
