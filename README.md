@@ -1,5 +1,7 @@
 ## Citus Example: Ad Analytics
 
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/citusdata/citus-example-ad-analytics)
+
 Example app that uses the distributed Citus database to provide a realtime ad analytics dashboard.
 
 You can see the deployed version at http://citus-example-ad-analytics.herokuapp.com/
@@ -7,12 +9,16 @@ You can see the deployed version at http://citus-example-ad-analytics.herokuapp.
 ## Deploying on Citus Cloud and Heroku
 
 1. Signup for a Citus Cloud account: https://console.citusdata.com/users/sign_up
-2. Provision a new formation of servers (they are billed hourly), a small one will suffice for testing
-3. On the formation detail page, wait until the cluster is configured, then click *Show Full URL* and copy it to your clipboard
-4. [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/citusdata/citus-example-ad-analytics) and enter the URL from your clipboard as DATABASE_URL
-5. Run `heroku run:detached rake test_data:load_bulk` to start loading data - this will work in the background and take a while
+2. Provision a new formation of servers (they are billed hourly), a small one is good for testing
+3. On the formation detail page, wait until the cluster is configured, then click *Show Full URL* and copy it to your clipboard<br>
+<img src="http://f.cl.ly/items/13453P1H3g3o19272S0e/Screen%20Shot%202016-06-05%20at%209.51.05%20PM.png" width=600" />
+4. Click the "Deploy to Heroku" button and enter the URL from your clipboard as `DATABASE_URL`:<br>
+<img src="http://f.cl.ly/items/071U2k270Q3y0u0G1V1q/Screen%20Shot%202016-06-06%20at%2012.24.54%20AM.png" width="400" />
+5. Run `heroku run:detached rake test_data:load_bulk` to load sample data - this will take a while
 
-Note: If you get an error like "could not find the source blob" on Heroku deploy, just click the Deploy button again. Also note that Heroku will automatically provision a tiny Postgres instance for you - you don't need that instance and can remove it after creation.
+After starting the data load task visit the app to see an example of what you can build with Citus.
+
+Note: If you get an error like "could not find the source blob" on Heroku deploy, just click the Deploy button again.
 
 ## Screenshots
 
