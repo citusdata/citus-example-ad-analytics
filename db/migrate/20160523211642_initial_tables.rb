@@ -28,7 +28,8 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :ads do |t|
+    create_table :ads, id: false do |t|
+      t.uuid :id, null: false
       t.references :campaign, null: false, index: true
 
       t.text :name, null: false
@@ -40,7 +41,7 @@ class InitialTables < ActiveRecord::Migration
 
     create_table :impressions, id: false do |t|
       t.uuid :id, null: false
-      t.references :ad, null: false, index: true
+      t.uuid :ad_id, null: false, index: true
       t.timestamp :seen_at, null: false
 
       t.text :site_url, null: false
@@ -52,7 +53,7 @@ class InitialTables < ActiveRecord::Migration
 
     create_table :clicks, id: false do |t|
       t.uuid :id, null: false
-      t.references :ad, null: false, index: true
+      t.uuid :ad_id, null: false, index: true
       t.timestamp :clicked_at, null: false
 
       t.text :site_url, null: false
@@ -62,8 +63,10 @@ class InitialTables < ActiveRecord::Migration
       t.jsonb :user_data, null: false # agent, is_mobile, location
     end
 
+    execute "SELECT master_create_distributed_table('ads', 'id', 'hash')"
     execute "SELECT master_create_distributed_table('impressions', 'ad_id', 'hash')"
     execute "SELECT master_create_distributed_table('clicks', 'ad_id', 'hash')"
+    execute "SELECT master_create_worker_shards('ads', 16, 1)"
     execute "SELECT master_create_worker_shards('impressions', 16, 1)"
     execute "SELECT master_create_worker_shards('clicks', 16, 1)"
   end
@@ -71,7 +74,6 @@ class InitialTables < ActiveRecord::Migration
   def down
     drop_table :accounts
     drop_table :campaigns
-    drop_table :ads
 
     execute <<-SQL
     DROP TYPE campaign_cost_model;
@@ -81,6 +83,7 @@ class InitialTables < ActiveRecord::Migration
 
     # Distributed tables can't be dropped within a transaction
     execute 'COMMIT'
+    drop_table :ads
     drop_table :impressions
     drop_table :clicks
     execute 'BEGIN'
