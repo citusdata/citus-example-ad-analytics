@@ -33,7 +33,7 @@ We're distributing only the part of our dataset that we expect to take significa
 
 We use `ad_id` as the common shard key for the hash distribution, in order to have data for a specific ad colocated on one shard.
 
-## Feature Highlight: Co-Located Joins
+## Feature Highlight: Colocated Joins
 
 > To join two large tables efficiently, it is advised that you distribute them on the same columns you used to join the tables. In this case, the Citus master knows which shards of the tables might match with shards of the other table by looking at the distribution column metadata. This allows Citus to prune away shard pairs which cannot produce matching join keys. The joins between remaining shard pairs are executed in parallel on the workers and then the results are returned to the master.
 <br>https://www.citusdata.com/docs/citus/5.1/dist_tables/querying.html#colocated-joins
