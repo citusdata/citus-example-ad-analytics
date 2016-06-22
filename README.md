@@ -29,9 +29,24 @@ Note: If you get an error like "could not find the source blob" on Heroku deploy
 <img src="http://cl.ly/0n3G0Q453p1X/schema_diagram.png" width="600" />
 
 We're distributing only the part of our dataset that we expect to take significant amounts of space, specifically
-`clicks` and `impressions`.
+`ads`, `clicks` and `impressions`.
 
 We use `ad_id` as the common shard key for the hash distribution, in order to have data for a specific ad colocated on one shard.
+
+## Feature Highlight: Co-Located Joins
+
+> To join two large tables efficiently, it is advised that you distribute them on the same columns you used to join the tables. In this case, the Citus master knows which shards of the tables might match with shards of the other table by looking at the distribution column metadata. This allows Citus to prune away shard pairs which cannot produce matching join keys. The joins between remaining shard pairs are executed in parallel on the workers and then the results are returned to the master.
+<br>https://www.citusdata.com/docs/citus/5.1/dist_tables/querying.html#colocated-joins
+
+In this reference app we're showing co-located joins between the `ads` table and the `impressions` and `clicks` tables. You can see these queries on the bottom of the campaign list and individual campaign pages, for example:
+
+```sql
+SELECT ads.campaign_id, COUNT(*)
+  FROM ads
+       JOIN impressions ON (ads.id = ad_id)
+ WHERE ads.campaign_id IN (1,2,3,4,5,6,7,8,9,10,11)
+ GROUP BY ads.campaign_id
+```
 
 ## LICENSE
 
