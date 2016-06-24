@@ -71,7 +71,9 @@ This demo app also shows how to work with historic data effectively. Since our i
 
 Specifically, we can roll-up the data into daily count values, so we avoid having to read the entire table when we want to find the total amount of clicks for a given ad or campaign.
 
-You can see the task that runs daily here: https://github.com/citusdata/citus-example-ad-analytics/blob/master/lib/tasks/rollup.rake#L24 (it uses an UPSERT just in case)
+You can see the task that runs daily here: https://github.com/citusdata/citus-example-ad-analytics/blob/master/lib/tasks/rollup.rake#L24
+
+## Feature Highlight: BRIN indices to find recent data
 
 In order to also include recent data into count values that are displayed, we're using a [BRIN index](https://www.postgresql.org/docs/9.5/static/brin-intro.html) on `impressions.seen_at` and `clicks.clicked_at` to quickly find the recent records which are not contained in the roll-up tables yet.
 
