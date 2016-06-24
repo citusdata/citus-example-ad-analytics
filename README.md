@@ -71,6 +71,28 @@ This demo app also shows how to work with historic data effectively. Since our i
 
 Specifically, we can roll-up the data into daily count values, so we avoid having to read the entire table when we want to find the total amount of clicks for a given ad or campaign.
 
+```
+citus=> \d impression_daily_rollups
+Table "public.impression_daily_rollups"
+ Column |  Type  | Modifiers 
+--------+--------+-----------
+ ad_id  | uuid   | not null
+ count  | bigint | not null
+ date   | date   | not null
+Indexes:
+    "impression_daily_rollups_pkey" PRIMARY KEY, btree (ad_id, date)
+
+citus=> \d click_daily_rollups
+Table "public.click_daily_rollups"
+ Column |  Type  | Modifiers 
+--------+--------+-----------
+ ad_id  | uuid   | not null
+ count  | bigint | not null
+ date   | date   | not null
+Indexes:
+    "click_daily_rollups_pkey" PRIMARY KEY, btree (ad_id, date)
+```
+
 You can see the task that runs daily here: https://github.com/citusdata/citus-example-ad-analytics/blob/master/lib/tasks/rollup.rake#L24
 
 ## Feature Highlight: BRIN indices to find recent data
