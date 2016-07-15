@@ -14,6 +14,13 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: postgres; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON DATABASE postgres IS 'default administrative connection database';
+
+
+--
 -- Name: citus; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -42,216 +49,6 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
--- Name: btree_gin; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS btree_gin WITH SCHEMA public;
-
-
---
--- Name: EXTENSION btree_gin; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION btree_gin IS 'support for indexing common datatypes in GIN';
-
-
---
--- Name: btree_gist; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public;
-
-
---
--- Name: EXTENSION btree_gist; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION btree_gist IS 'support for indexing common datatypes in GiST';
-
-
---
--- Name: cube; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS cube WITH SCHEMA public;
-
-
---
--- Name: EXTENSION cube; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION cube IS 'data type for multidimensional cubes';
-
-
---
--- Name: dblink; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS dblink WITH SCHEMA public;
-
-
---
--- Name: EXTENSION dblink; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION dblink IS 'connect to other PostgreSQL databases from within a database';
-
-
---
--- Name: earthdistance; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS earthdistance WITH SCHEMA public;
-
-
---
--- Name: EXTENSION earthdistance; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION earthdistance IS 'calculate great-circle distances on the surface of the Earth';
-
-
---
--- Name: hll; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS hll WITH SCHEMA public;
-
-
---
--- Name: EXTENSION hll; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION hll IS 'type for storing hyperloglog data';
-
-
---
--- Name: hstore; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
-
-
---
--- Name: EXTENSION hstore; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION hstore IS 'data type for storing sets of (key, value) pairs';
-
-
---
--- Name: intarray; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS intarray WITH SCHEMA public;
-
-
---
--- Name: EXTENSION intarray; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION intarray IS 'functions, operators, and index support for 1-D arrays of integers';
-
-
---
--- Name: pg_prewarm; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_prewarm WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_prewarm; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION pg_prewarm IS 'prewarm relation data';
-
-
---
--- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION pg_stat_statements IS 'track execution statistics of all SQL statements executed';
-
-
---
--- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
-
-
---
--- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
-
-
---
--- Name: postgis; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
-
-
---
--- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
-
-
---
--- Name: sslinfo; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS sslinfo WITH SCHEMA public;
-
-
---
--- Name: EXTENSION sslinfo; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION sslinfo IS 'information about SSL certificates';
-
-
---
--- Name: unaccent; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
-
-
---
--- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION unaccent IS 'text search dictionary that removes accents';
-
-
---
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -263,20 +60,6 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 --
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
-
-
---
--- Name: xml2; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS xml2 WITH SCHEMA public;
-
-
---
--- Name: EXTENSION xml2; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION xml2 IS 'XPath querying and XSLT';
 
 
 SET search_path = public, pg_catalog;
@@ -356,7 +139,7 @@ ALTER SEQUENCE accounts_id_seq OWNED BY accounts.id;
 --
 
 CREATE TABLE ads (
-    id uuid NOT NULL,
+    id uuid DEFAULT uuid_generate_v4(),
     campaign_id integer NOT NULL,
     name text NOT NULL,
     image_url text NOT NULL,
@@ -404,11 +187,22 @@ ALTER SEQUENCE campaigns_id_seq OWNED BY campaigns.id;
 
 
 --
+-- Name: click_daily_rollups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE click_daily_rollups (
+    ad_id uuid NOT NULL,
+    count bigint NOT NULL,
+    date date NOT NULL
+);
+
+
+--
 -- Name: clicks; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE clicks (
-    id uuid NOT NULL,
+    id uuid DEFAULT uuid_generate_v4(),
     ad_id uuid NOT NULL,
     clicked_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
@@ -419,11 +213,22 @@ CREATE TABLE clicks (
 
 
 --
+-- Name: impression_daily_rollups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE impression_daily_rollups (
+    ad_id uuid NOT NULL,
+    count bigint NOT NULL,
+    date date NOT NULL
+);
+
+
+--
 -- Name: impressions; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE impressions (
-    id uuid NOT NULL,
+    id uuid DEFAULT uuid_generate_v4(),
     ad_id uuid NOT NULL,
     seen_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
@@ -473,6 +278,36 @@ ALTER TABLE ONLY campaigns
 
 
 --
+-- Name: click_daily_rollups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY click_daily_rollups
+    ADD CONSTRAINT click_daily_rollups_pkey PRIMARY KEY (ad_id, date);
+
+
+--
+-- Name: impression_daily_rollups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY impression_daily_rollups
+    ADD CONSTRAINT impression_daily_rollups_pkey PRIMARY KEY (ad_id, date);
+
+
+--
+-- Name: clicks_clicked_at_brin; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX clicks_clicked_at_brin ON clicks USING brin (clicked_at);
+
+
+--
+-- Name: impressions_seen_at_brin; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX impressions_seen_at_brin ON impressions USING brin (seen_at);
+
+
+--
 -- Name: index_ads_on_campaign_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -514,4 +349,6 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 SET search_path TO "$user", public;
 
 INSERT INTO schema_migrations (version) VALUES ('20160523211642');
+
+INSERT INTO schema_migrations (version) VALUES ('20160622202229');
 

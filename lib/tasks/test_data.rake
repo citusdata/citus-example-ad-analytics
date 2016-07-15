@@ -3,10 +3,10 @@
 def generate_fake_impressions(ad_id, impression_count, user_ips, ts_start, ts_end)
   cpi_amount_range = rand(0.001..0.01)
 
-  Impression.copy_from_client [:id, :ad_id, :seen_at, :site_url, :user_ip, :user_data, :cost_per_impression_usd] do |copy|
+  Impression.copy_from_client [:ad_id, :seen_at, :site_url, :user_ip, :user_data, :cost_per_impression_usd] do |copy|
     impression_count.times do |impression_num|
       print 'I'
-      copy << [SecureRandom.uuid, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips[impression_num],
+      copy << [ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips[impression_num],
                { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code }, nil]
                #campaign.cost_model == 'cost_per_impression' ? rand(cpi_amount_range) : nil]
     end
@@ -16,10 +16,10 @@ end
 def generate_fake_clicks(ad_id, click_count, user_ips, ts_start, ts_end)
   cpc_amount_range = rand(1.0..5.0)
 
-  Click.copy_from_client [:id, :ad_id, :clicked_at, :site_url, :user_ip, :user_data, :cost_per_click_usd] do |copy|
+  Click.copy_from_client [:ad_id, :clicked_at, :site_url, :user_ip, :user_data, :cost_per_click_usd] do |copy|
     click_count.times do
       print 'C'
-      copy << [SecureRandom.uuid, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips.sample,
+      copy << [ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips.sample,
                { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code }, nil]
                #campaign.cost_model == 'cost_per_click' ? rand(cpc_amount_range) : nil]
     end
@@ -39,7 +39,7 @@ namespace :test_data do
     ts_start = 6.months.ago
     ts_end   = Time.now
 
-    account_count_range    = 100..100
+    account_count_range    = 2..2 #100..100
     campaign_count_range   = 2..15
     ad_count_range         = 3..5
     impression_count_range = 50_000..500_000
@@ -62,12 +62,10 @@ namespace :test_data do
         rand(ad_count_range).times do
           print 'A'
 
-          ad_id = SecureRandom.uuid
-
-          ad = Ad.create! id: ad_id, name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
+          ad = Ad.create! id: SecureRandom.uuid, name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
                           target_url: Faker::Internet.url(domain_name), campaign: campaign
 
-          generate_fake_data_for_ad ad_id,
+          generate_fake_data_for_ad ad.id,
                                     impression_count: rand(impression_count_range),
                                     click_count: rand(click_count_range),
                                     ts_start: ts_start,

@@ -1,5 +1,7 @@
 class InitialTables < ActiveRecord::Migration
   def up
+    enable_extension 'uuid-ossp'
+
     execute <<-SQL
     CREATE TYPE campaign_cost_model AS ENUM ('cost_per_click', 'cost_per_impression');
     CREATE TYPE campaign_state AS ENUM ('paused', 'running', 'archived');
@@ -29,7 +31,7 @@ class InitialTables < ActiveRecord::Migration
     end
 
     create_table :ads, id: false do |t|
-      t.uuid :id, null: false
+      t.uuid :id, null: false, default: 'uuid_generate_v4()'
       t.references :campaign, null: false, index: true
 
       t.text :name, null: false
@@ -40,7 +42,7 @@ class InitialTables < ActiveRecord::Migration
     end
 
     create_table :impressions, id: false do |t|
-      t.uuid :id, null: false
+      t.uuid :id, null: false, default: 'uuid_generate_v4()'
       t.uuid :ad_id, null: false, index: true
       t.timestamp :seen_at, null: false
 
@@ -52,7 +54,7 @@ class InitialTables < ActiveRecord::Migration
     end
 
     create_table :clicks, id: false do |t|
-      t.uuid :id, null: false
+      t.uuid :id, null: false, default: 'uuid_generate_v4()'
       t.uuid :ad_id, null: false, index: true
       t.timestamp :clicked_at, null: false
 

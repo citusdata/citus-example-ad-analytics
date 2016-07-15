@@ -4,7 +4,6 @@ default: &default
   pool: 5
   timeout: 5000
   prepared_statements: false
-  insert_returning: false
 
 development:
   <<: *default
