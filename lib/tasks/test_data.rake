@@ -26,11 +26,16 @@ def generate_fake_clicks(ad_id, click_count, user_ips, ts_start, ts_end)
   end
 end
 
-def generate_fake_data_for_ad(ad_id, impression_count:, click_count:, ts_start:, ts_end:)
+def generate_fake_data_for_ad(ad, impression_count:, click_count:, ts_start:, ts_end:)
   user_ips = impression_count.times.map { Faker::Internet.ip_v4_address }
 
-  generate_fake_impressions(ad_id, impression_count, user_ips, ts_start, ts_end)
-  generate_fake_clicks(ad_id, click_count, user_ips, ts_start, ts_end)
+  generate_fake_impressions(ad.id, impression_count, user_ips, ts_start, ts_end)
+  generate_fake_clicks(ad.id, click_count, user_ips, ts_start, ts_end)
+
+  # Update counter cache and touch manually since we're using COPY
+  ad.update! impressions_count: ad.impressions_count + impression_count,
+             clicks_count: ad.clicks_count + click_count,
+             updated_at: Time.now
 end
 
 namespace :test_data do
@@ -53,19 +58,19 @@ namespace :test_data do
       rand(campaign_count_range).times do
         print 'C'
 
-        campaign = Campaign.create! account: account, name: Faker::Superhero.name,
-                                    cost_model: ['cost_per_click', 'cost_per_impression'][rand(0..1)],
-                                    state: ['paused', 'running', 'archived'][rand(0..2)]
+        campaign = account.campaigns.create! name: Faker::Superhero.name,
+                                             cost_model: ['cost_per_click', 'cost_per_impression'][rand(0..1)],
+                                             state: ['paused', 'running', 'archived'][rand(0..2)]
 
         domain_name = Faker::Internet.domain_name
 
         rand(ad_count_range).times do
           print 'A'
 
-          ad = Ad.create! id: SecureRandom.uuid, name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
-                          target_url: Faker::Internet.url(domain_name), campaign: campaign
+          ad = campaign.ads.create! id: SecureRandom.uuid, name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
+                                    target_url: Faker::Internet.url(domain_name)
 
-          generate_fake_data_for_ad ad.id,
+          generate_fake_data_for_ad ad,
                                     impression_count: rand(impression_count_range),
                                     click_count: rand(click_count_range),
                                     ts_start: ts_start,
@@ -89,7 +94,7 @@ namespace :test_data do
         next if ad.campaign.state != 'running'
 
         print 'A'
-        generate_fake_data_for_ad ad.id,
+        generate_fake_data_for_ad ad,
                                   impression_count: rand(impression_count_range),
                                   click_count: rand(click_count_range),
                                   ts_start: ts_start,

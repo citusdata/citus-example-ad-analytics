@@ -1,6 +1,6 @@
 class Click < ActiveRecord::Base
-  include DistributedTable
-  self.primary_keys = :id, :ad_id
+  include PostgresCopyFromClient
+  self.primary_keys = :click_id, :ad_id
 
-  belongs_to :ad
+  belongs_to :ad, counter_cache: true, touch: true
 end

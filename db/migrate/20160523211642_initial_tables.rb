@@ -38,11 +38,14 @@ class InitialTables < ActiveRecord::Migration
       t.text :image_url, null: false
       t.text :target_url, null: false
 
+      t.integer :impressions_count, null: false, default: 0, limit: 8
+      t.integer :clicks_count, null: false, default: 0, limit: 8
+
       t.timestamps null: false
     end
 
     create_table :impressions, id: false do |t|
-      t.uuid :id, null: false, default: 'uuid_generate_v4()'
+      t.uuid :impression_id, null: false, default: 'uuid_generate_v4()'
       t.uuid :ad_id, null: false, index: true
       t.timestamp :seen_at, null: false
 
@@ -54,7 +57,7 @@ class InitialTables < ActiveRecord::Migration
     end
 
     create_table :clicks, id: false do |t|
-      t.uuid :id, null: false, default: 'uuid_generate_v4()'
+      t.uuid :click_id, null: false, default: 'uuid_generate_v4()'
       t.uuid :ad_id, null: false, index: true
       t.timestamp :clicked_at, null: false
 
@@ -64,6 +67,9 @@ class InitialTables < ActiveRecord::Migration
       t.inet :user_ip, null: false
       t.jsonb :user_data, null: false # agent, is_mobile, location
     end
+
+    execute "ALTER TABLE impressions ADD PRIMARY KEY (impression_id, ad_id)"
+    execute "ALTER TABLE clicks ADD PRIMARY KEY (click_id, ad_id)"
 
     execute "SELECT master_create_distributed_table('ads', 'id', 'hash')"
     execute "SELECT master_create_distributed_table('impressions', 'ad_id', 'hash')"
@@ -83,7 +89,7 @@ class InitialTables < ActiveRecord::Migration
     DROP TYPE campaign_budget_interval;
     SQL
 
-    # Distributed tables can't be dropped within a transaction
+    # DDL can't run within a transaction (Citus #668)
     execute 'COMMIT'
     drop_table :ads
     drop_table :impressions

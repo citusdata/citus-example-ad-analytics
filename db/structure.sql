@@ -144,6 +144,8 @@ CREATE TABLE ads (
     name text NOT NULL,
     image_url text NOT NULL,
     target_url text NOT NULL,
+    impressions_count bigint DEFAULT 0 NOT NULL,
+    clicks_count bigint DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -202,7 +204,7 @@ CREATE TABLE click_daily_rollups (
 --
 
 CREATE TABLE clicks (
-    id uuid DEFAULT uuid_generate_v4(),
+    click_id uuid DEFAULT uuid_generate_v4() NOT NULL,
     ad_id uuid NOT NULL,
     clicked_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
@@ -228,7 +230,7 @@ CREATE TABLE impression_daily_rollups (
 --
 
 CREATE TABLE impressions (
-    id uuid DEFAULT uuid_generate_v4(),
+    impression_id uuid DEFAULT uuid_generate_v4() NOT NULL,
     ad_id uuid NOT NULL,
     seen_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
@@ -286,11 +288,27 @@ ALTER TABLE ONLY click_daily_rollups
 
 
 --
+-- Name: clicks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY clicks
+    ADD CONSTRAINT clicks_pkey PRIMARY KEY (click_id, ad_id);
+
+
+--
 -- Name: impression_daily_rollups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY impression_daily_rollups
     ADD CONSTRAINT impression_daily_rollups_pkey PRIMARY KEY (ad_id, date);
+
+
+--
+-- Name: impressions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY impressions
+    ADD CONSTRAINT impressions_pkey PRIMARY KEY (impression_id, ad_id);
 
 
 --

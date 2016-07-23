@@ -74,7 +74,7 @@ Specifically, we can roll-up the data into daily count values, so we avoid havin
 ```
 citus=> \d impression_daily_rollups
 Table "public.impression_daily_rollups"
- Column |  Type  | Modifiers 
+ Column |  Type  | Modifiers
 --------+--------+-----------
  ad_id  | uuid   | not null
  count  | bigint | not null
@@ -84,7 +84,7 @@ Indexes:
 
 citus=> \d click_daily_rollups
 Table "public.click_daily_rollups"
- Column |  Type  | Modifiers 
+ Column |  Type  | Modifiers
 --------+--------+-----------
  ad_id  | uuid   | not null
  count  | bigint | not null
@@ -94,6 +94,24 @@ Indexes:
 ```
 
 You can see the task that runs daily here: https://github.com/citusdata/citus-example-ad-analytics/blob/master/lib/tasks/rollup.rake#L24
+
+## Feature Highlight: Single-node transactions
+
+With Citus you can use transactions in your code, as long as they only touch a single node. This can also be used to update multiple tables which are co-located.
+
+In this app this is used to allow Rails' `counter_cache: true` and `touch: true` to update the parent record correctly.
+
+Example:
+
+```
+irb(main):003:0> impression.destroy
+BEGIN
+DELETE FROM "impressions" WHERE "impressions"."impression_id" = 'fffff511-7012-4c5e-8431-5f97efd72926' AND "impressions"."ad_id" = '7fc94c84-f39f-4c7d-bf9e-bdbf5211a2f9'
+SELECT  "ads".* FROM "ads" WHERE "ads"."id" = '7fc94c84-f39f-4c7d-bf9e-bdbf5211a2f9' LIMIT 1
+UPDATE "ads" SET "impressions_count" = COALESCE("impressions_count", 0) - 1 WHERE "ads"."id" = '7fc94c84-f39f-4c7d-bf9e-bdbf5211a2f9'
+UPDATE "ads" SET "updated_at" = '2016-07-22 23:52:59.667746' WHERE "ads"."id" = '7fc94c84-f39f-4c7d-bf9e-bdbf5211a2f9'
+COMMIT
+```
 
 ## Feature Highlight: BRIN indices to find recent data
 
