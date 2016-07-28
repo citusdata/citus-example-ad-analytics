@@ -30,8 +30,7 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :ads, id: false do |t|
-      t.uuid :id, null: false, default: 'uuid_generate_v4()'
+    create_table :ads do |t|
       t.references :campaign, null: false, index: true
 
       t.text :name, null: false
@@ -44,9 +43,8 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :impressions, id: false do |t|
-      t.uuid :impression_id, null: false, default: 'uuid_generate_v4()'
-      t.uuid :ad_id, null: false, index: true
+    create_table :impressions, primary_key: 'impression_id', id: :uuid do |t|
+      t.references :ad, null: false, index: true
       t.timestamp :seen_at, null: false
 
       t.text :site_url, null: false
@@ -56,9 +54,8 @@ class InitialTables < ActiveRecord::Migration
       t.jsonb :user_data, null: false # agent, is_mobile, location
     end
 
-    create_table :clicks, id: false do |t|
-      t.uuid :click_id, null: false, default: 'uuid_generate_v4()'
-      t.uuid :ad_id, null: false, index: true
+    create_table :clicks, primary_key: 'click_id', id: :uuid do |t|
+      t.references :ad, null: false, index: true
       t.timestamp :clicked_at, null: false
 
       t.text :site_url, null: false
@@ -68,7 +65,9 @@ class InitialTables < ActiveRecord::Migration
       t.jsonb :user_data, null: false # agent, is_mobile, location
     end
 
+    execute "ALTER TABLE impressions DROP CONSTRAINT impressions_pkey"
     execute "ALTER TABLE impressions ADD PRIMARY KEY (impression_id, ad_id)"
+    execute "ALTER TABLE clicks DROP CONSTRAINT clicks_pkey"
     execute "ALTER TABLE clicks ADD PRIMARY KEY (click_id, ad_id)"
 
     execute "SELECT master_create_distributed_table('ads', 'id', 'hash')"

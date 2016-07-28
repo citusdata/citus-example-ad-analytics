@@ -27,7 +27,7 @@
               <td><%= campaign.state.titleize %></td>
               <td><%= @impressions_by_campaign[campaign.id] %></td>
               <td><%= @clicks_by_campaign[campaign.id] %></td>
-              <td><%= @impressions_by_campaign[campaign.id] > 0 ? format("%0.2f%%", @clicks_by_campaign[campaign.id] / @impressions_by_campaign[campaign.id].to_f * 100) : '-' %></td>
+              <td><%= @clicks_by_campaign[campaign.id] && @impressions_by_campaign[campaign.id] > 0 ? format("%0.2f%%", @clicks_by_campaign[campaign.id] / @impressions_by_campaign[campaign.id].to_f * 100) : '-' %></td>
               <td>
                 <div class="progress progress-xs">
                   <div class="progress-bar progress-bar-danger" style="width: 55%"></div>

@@ -139,7 +139,7 @@ ALTER SEQUENCE accounts_id_seq OWNED BY accounts.id;
 --
 
 CREATE TABLE ads (
-    id uuid DEFAULT uuid_generate_v4(),
+    id integer NOT NULL,
     campaign_id integer NOT NULL,
     name text NOT NULL,
     image_url text NOT NULL,
@@ -149,6 +149,25 @@ CREATE TABLE ads (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
+
+
+--
+-- Name: ads_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE ads_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: ads_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE ads_id_seq OWNED BY ads.id;
 
 
 --
@@ -193,7 +212,7 @@ ALTER SEQUENCE campaigns_id_seq OWNED BY campaigns.id;
 --
 
 CREATE TABLE click_daily_rollups (
-    ad_id uuid NOT NULL,
+    ad_id integer NOT NULL,
     count bigint NOT NULL,
     date date NOT NULL
 );
@@ -205,7 +224,7 @@ CREATE TABLE click_daily_rollups (
 
 CREATE TABLE clicks (
     click_id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    ad_id uuid NOT NULL,
+    ad_id integer NOT NULL,
     clicked_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
     cost_per_click_usd numeric(20,10),
@@ -219,7 +238,7 @@ CREATE TABLE clicks (
 --
 
 CREATE TABLE impression_daily_rollups (
-    ad_id uuid NOT NULL,
+    ad_id integer NOT NULL,
     count bigint NOT NULL,
     date date NOT NULL
 );
@@ -231,7 +250,7 @@ CREATE TABLE impression_daily_rollups (
 
 CREATE TABLE impressions (
     impression_id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    ad_id uuid NOT NULL,
+    ad_id integer NOT NULL,
     seen_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
     cost_per_impression_usd numeric(20,10),
@@ -260,6 +279,13 @@ ALTER TABLE ONLY accounts ALTER COLUMN id SET DEFAULT nextval('accounts_id_seq':
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY ads ALTER COLUMN id SET DEFAULT nextval('ads_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY campaigns ALTER COLUMN id SET DEFAULT nextval('campaigns_id_seq'::regclass);
 
 
@@ -269,6 +295,14 @@ ALTER TABLE ONLY campaigns ALTER COLUMN id SET DEFAULT nextval('campaigns_id_seq
 
 ALTER TABLE ONLY accounts
     ADD CONSTRAINT accounts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY ads
+    ADD CONSTRAINT ads_pkey PRIMARY KEY (id);
 
 
 --

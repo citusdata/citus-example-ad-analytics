@@ -1,13 +1,13 @@
 class AddImpressionClickCountRollups < ActiveRecord::Migration
   def up
     create_table :impression_daily_rollups, id: false do |t|
-      t.uuid :ad_id, null: false
+      t.references :ad, null: false
       t.integer :count, limit: 8, null: false
       t.date :date, null: false
     end
 
     create_table :click_daily_rollups, id: false do |t|
-      t.uuid :ad_id, null: false
+      t.references :ad, null: false
       t.integer :count, limit: 8, null: false
       t.date :date, null: false
     end
