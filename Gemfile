@@ -7,7 +7,7 @@ gem 'puma'
 gem 'faker'
 gem 'devise'
 gem 'pg_data_encoder', github: 'lfittl/pg_data_encoder'
-gem 'composite_primary_keys', '8.1.3'
+gem 'composite_primary_keys', '8.1.4'
 
 gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
