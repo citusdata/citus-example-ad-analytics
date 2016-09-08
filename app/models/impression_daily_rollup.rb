@@ -1,5 +1,6 @@
 class ImpressionDailyRollup < ActiveRecord::Base
-  include DistributedTable
+  include FixCompositeKeyInsert
+
   self.primary_keys = :ad_id, :date
 
   belongs_to :ad

@@ -1,5 +1,6 @@
 class Ad < ActiveRecord::Base
   include PostgresCopyFromClient
+
   self.primary_keys = :id
 
   belongs_to :campaign
