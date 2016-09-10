@@ -1,7 +1,7 @@
 class Ad < ActiveRecord::Base
-  include PostgresCopyFromClient
-
   self.primary_keys = :id
+
+  acts_as_distributed partition_column: :id
 
   belongs_to :campaign
   has_many :clicks, dependent: :delete_all

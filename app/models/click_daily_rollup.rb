@@ -1,7 +1,7 @@
 class ClickDailyRollup < ActiveRecord::Base
-  include FixCompositeKeyInsert
-
   self.primary_keys = :ad_id, :date
+
+  acts_as_distributed partition_column: :ad_id
 
   belongs_to :ad
 end

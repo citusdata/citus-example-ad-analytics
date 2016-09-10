@@ -1,36 +1,40 @@
 # rubocop:disable all
 
-def generate_fake_impressions(ad_id, impression_count, user_ips, ts_start, ts_end)
+def generate_fake_impressions(ad_id, impression_count, user_ips, ts_start, ts_end, cost_model)
   cpi_amount_range = rand(0.001..0.01)
 
-  Impression.copy_from_client [:ad_id, :seen_at, :site_url, :user_ip, :user_data, :cost_per_impression_usd] do |copy|
+  count = Impression.copy_from_client [:ad_id, :seen_at, :site_url, :user_ip, :user_data, :cost_per_impression_usd] do |copy|
     impression_count.times do |impression_num|
-      print 'I'
+      print "  -> Generating impressions: #{impression_num}\r"
       copy << [ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips[impression_num],
-               { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code }, nil]
-               #campaign.cost_model == 'cost_per_impression' ? rand(cpi_amount_range) : nil]
+               { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
+               cost_model == 'cost_per_impression' ? rand(cpi_amount_range) : nil]
     end
   end
+
+  puts "  -> Generated #{count} impressions" + " " * 10
 end
 
-def generate_fake_clicks(ad_id, click_count, user_ips, ts_start, ts_end)
+def generate_fake_clicks(ad_id, click_count, user_ips, ts_start, ts_end, cost_model)
   cpc_amount_range = rand(1.0..5.0)
 
-  Click.copy_from_client [:ad_id, :clicked_at, :site_url, :user_ip, :user_data, :cost_per_click_usd] do |copy|
-    click_count.times do
-      print 'C'
+  count = Click.copy_from_client [:ad_id, :clicked_at, :site_url, :user_ip, :user_data, :cost_per_click_usd] do |copy|
+    click_count.times do |click_num|
+      print "  -> Generating clicks: #{click_num}\r"
       copy << [ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips.sample,
-               { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code }, nil]
-               #campaign.cost_model == 'cost_per_click' ? rand(cpc_amount_range) : nil]
+               { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
+                 cost_model == 'cost_per_click' ? rand(cpc_amount_range) : nil]
     end
   end
+
+  puts "  -> Generated #{count} clicks" + " " * 10
 end
 
 def generate_fake_data_for_ad(ad, impression_count:, click_count:, ts_start:, ts_end:)
   user_ips = impression_count.times.map { Faker::Internet.ip_v4_address }
 
-  generate_fake_impressions(ad.id, impression_count, user_ips, ts_start, ts_end)
-  generate_fake_clicks(ad.id, click_count, user_ips, ts_start, ts_end)
+  generate_fake_impressions(ad.id, impression_count, user_ips, ts_start, ts_end, ad.campaign.cost_model)
+  generate_fake_clicks(ad.id, click_count, user_ips, ts_start, ts_end, ad.campaign.cost_model)
 
   # Update counter cache and touch manually since we're using COPY
   ad.update! impressions_count: ad.impressions_count + impression_count,
@@ -56,22 +60,22 @@ namespace :test_data do
       account = Account.create! name: Faker::Name.name, email: Faker::Internet.email, password: Faker::Internet.password, image_url: Faker::Avatar.image
 
       rand(campaign_count_range).times do
-        print 'C'
-
         campaign = account.campaigns.create! name: Faker::Superhero.name,
                                              cost_model: ['cost_per_click', 'cost_per_impression'][rand(0..1)],
                                              state: ['paused', 'running', 'archived'][rand(0..2)]
 
+        puts "Campaign ##{campaign.id}"
+
         domain_name = Faker::Internet.domain_name
 
         rand(ad_count_range).times do
-          print 'A'
-
           # Workaround for https://github.com/citusdata/citus/issues/687
           ad_id = Ad.connection.select_value("SELECT nextval('ads_id_seq'::regclass)")
 
           ad = campaign.ads.create! id: ad_id, name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
                                     target_url: Faker::Internet.url(domain_name)
+
+          puts "  Ad ##{ad.id}"
 
           generate_fake_data_for_ad ad,
                                     impression_count: rand(impression_count_range),

@@ -1,10 +1,4 @@
 GIT
-  remote: git://github.com/lfittl/pg_data_encoder.git
-  revision: 8f2b1916d2dadf6ed7e009724bc20e6b80cad348
-  specs:
-    pg_data_encoder (0.1.10)
-
-GIT
   remote: git://github.com/lfittl/pgdatagraph.git
   revision: b8c9ed796640ade2db5bb81c7fdc642b014fce5a
   specs:
@@ -58,6 +52,11 @@ GEM
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
     builder (3.2.2)
+    citus-rails (0.1.1)
+      citus-rails-4.2
+    citus-rails-4.2 (0.1.0)
+      activerecord (~> 4.2)
+      composite_primary_keys (~> 8.0)
     coffee-rails (4.2.1)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0, < 5.2.x)
@@ -167,14 +166,13 @@ PLATFORMS
 
 DEPENDENCIES
   bootstrap-sass
-  composite_primary_keys (= 8.1.4)
+  citus-rails
   devise
   dotenv-rails
   faker
   font-awesome-rails
   jquery-rails
   pg
-  pg_data_encoder!
   pgdatagraph!
   puma
   rails (= 4.2.7)
