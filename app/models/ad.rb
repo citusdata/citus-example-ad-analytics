@@ -1,7 +1,5 @@
 class Ad < ActiveRecord::Base
-  self.primary_keys = :id
-
-  acts_as_distributed partition_column: :id
+  acts_as_distributed :account
 
   belongs_to :campaign
   has_many :clicks, dependent: :delete_all

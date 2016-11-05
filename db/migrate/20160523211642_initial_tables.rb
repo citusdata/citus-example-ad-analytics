@@ -9,7 +9,6 @@ class InitialTables < ActiveRecord::Migration
     SQL
 
     create_table :accounts do |t|
-      t.text :email, null: false, unique: true
       t.text :encrypted_password, null: false
       t.text :name, null: false
       t.text :image_url, null: false
@@ -17,8 +16,13 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
+    create_table :account_emails do |t|
+      t.references :account, null: false
+      t.text :email, null: false, unique: true
+    end
+
     create_table :campaigns do |t|
-      t.references :account, null: false, index: true
+      t.references :account, null: false
 
       t.text :name, null: false
       t.column :cost_model, :campaign_cost_model, null: false
@@ -31,7 +35,8 @@ class InitialTables < ActiveRecord::Migration
     end
 
     create_table :ads do |t|
-      t.references :campaign, null: false, index: true
+      t.references :account, null: false
+      t.references :campaign, null: false
 
       t.text :name, null: false
       t.text :image_url, null: false
@@ -43,8 +48,9 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :impressions, primary_key: 'impression_id', id: :uuid do |t|
-      t.references :ad, null: false, index: true
+    create_table :impressions, id: :uuid do |t|
+      t.references :account, null: false
+      t.references :ad, null: false
       t.timestamp :seen_at, null: false
 
       t.text :site_url, null: false
@@ -54,8 +60,9 @@ class InitialTables < ActiveRecord::Migration
       t.jsonb :user_data, null: false # agent, is_mobile, location
     end
 
-    create_table :clicks, primary_key: 'click_id', id: :uuid do |t|
-      t.references :ad, null: false, index: true
+    create_table :clicks, id: :uuid do |t|
+      t.references :account, null: false
+      t.references :ad, null: false
       t.timestamp :clicked_at, null: false
 
       t.text :site_url, null: false
@@ -65,34 +72,43 @@ class InitialTables < ActiveRecord::Migration
       t.jsonb :user_data, null: false # agent, is_mobile, location
     end
 
+    execute "ALTER TABLE campaigns DROP CONSTRAINT campaigns_pkey"
+    execute "ALTER TABLE campaigns ADD PRIMARY KEY (account_id, id)"
+    execute "ALTER TABLE ads DROP CONSTRAINT ads_pkey"
+    execute "ALTER TABLE ads ADD PRIMARY KEY (account_id, id)"
     execute "ALTER TABLE impressions DROP CONSTRAINT impressions_pkey"
-    execute "ALTER TABLE impressions ADD PRIMARY KEY (impression_id, ad_id)"
+    execute "ALTER TABLE impressions ADD PRIMARY KEY (account_id, id, ad_id)"
     execute "ALTER TABLE clicks DROP CONSTRAINT clicks_pkey"
-    execute "ALTER TABLE clicks ADD PRIMARY KEY (click_id, ad_id)"
+    execute "ALTER TABLE clicks ADD PRIMARY KEY (account_id, id, ad_id)"
 
-    execute "SELECT master_create_distributed_table('ads', 'id', 'hash')"
-    execute "SELECT master_create_distributed_table('impressions', 'ad_id', 'hash')"
-    execute "SELECT master_create_distributed_table('clicks', 'ad_id', 'hash')"
+    execute "SELECT master_create_distributed_table('accounts', 'id', 'hash')"
+    execute "SELECT master_create_distributed_table('campaigns', 'account_id', 'hash')"
+    execute "SELECT master_create_distributed_table('ads', 'account_id', 'hash')"
+    execute "SELECT master_create_distributed_table('impressions', 'account_id', 'hash')"
+    execute "SELECT master_create_distributed_table('clicks', 'account_id', 'hash')"
+    execute "SELECT master_create_worker_shards('accounts', 16, 1)"
+    execute "SELECT master_create_worker_shards('campaigns', 16, 1)"
     execute "SELECT master_create_worker_shards('ads', 16, 1)"
     execute "SELECT master_create_worker_shards('impressions', 16, 1)"
     execute "SELECT master_create_worker_shards('clicks', 16, 1)"
   end
 
   def down
+    drop_table :account_emails
+
+    # DROP TABLE statements can't run in a transaction block (Citus #774)
+    execute 'COMMIT'
     drop_table :accounts
     drop_table :campaigns
+    drop_table :ads
+    drop_table :impressions
+    drop_table :clicks
+    execute 'BEGIN'
 
     execute <<-SQL
     DROP TYPE campaign_cost_model;
     DROP TYPE campaign_state;
     DROP TYPE campaign_budget_interval;
     SQL
-
-    # DDL can't run within a transaction (Citus #668)
-    execute 'COMMIT'
-    drop_table :ads
-    drop_table :impressions
-    drop_table :clicks
-    execute 'BEGIN'
   end
 end

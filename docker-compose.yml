@@ -1,8 +1,16 @@
-db:
-  image: postgres:9.5
-  ports:
-    - "5432:5432"
-  volumes:
-    - /var/lib/postgresql/data
-  environment:
-    POSTGRES_USER: citus
+version: '2'
+
+services:
+  master:
+    container_name: 'citus_master'
+    image: 'citusdata/citus:5.2.1'
+    ports: ['5432:5432']
+    labels: ['com.citusdata.role=Master']
+  worker:
+    image: 'citusdata/citus:5.2.1'
+    labels: ['com.citusdata.role=Worker']
+  config:
+    container_name: 'citus_config'
+    image: 'citusdata/workerlist-gen:0.9.0'
+    volumes: ['/var/run/docker.sock:/tmp/docker.sock']
+    volumes_from: ['master']

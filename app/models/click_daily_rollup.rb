@@ -1,7 +1,5 @@
 class ClickDailyRollup < ActiveRecord::Base
-  self.primary_keys = :ad_id, :date
-
-  acts_as_distributed partition_column: :ad_id
+  acts_as_distributed :account
 
   belongs_to :ad
 end
