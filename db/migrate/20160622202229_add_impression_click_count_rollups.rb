@@ -14,7 +14,9 @@ class AddImpressionClickCountRollups < ActiveRecord::Migration
       t.date :date, null: false
     end
 
+    execute "ALTER TABLE impression_daily_rollups DROP CONSTRAINT impression_daily_rollups_pkey"
     execute "ALTER TABLE impression_daily_rollups ADD PRIMARY KEY(account_id, ad_id, date, id)"
+    execute "ALTER TABLE click_daily_rollups DROP CONSTRAINT click_daily_rollups_pkey"
     execute "ALTER TABLE click_daily_rollups ADD PRIMARY KEY(account_id, ad_id, date, id)"
 
     execute "SELECT master_create_distributed_table('impression_daily_rollups', 'account_id', 'hash')"

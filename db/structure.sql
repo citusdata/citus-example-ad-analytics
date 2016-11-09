@@ -64,38 +64,6 @@ COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UU
 
 SET search_path = public, pg_catalog;
 
---
--- Name: campaign_budget_interval; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE campaign_budget_interval AS ENUM (
-    'daily',
-    'weekly',
-    'monthly'
-);
-
-
---
--- Name: campaign_cost_model; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE campaign_cost_model AS ENUM (
-    'cost_per_click',
-    'cost_per_impression'
-);
-
-
---
--- Name: campaign_state; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE campaign_state AS ENUM (
-    'paused',
-    'running',
-    'archived'
-);
-
-
 SET default_tablespace = '';
 
 SET default_with_oids = false;
@@ -106,8 +74,6 @@ SET default_with_oids = false;
 
 CREATE TABLE accounts (
     id integer NOT NULL,
-    email text NOT NULL,
-    encrypted_password text NOT NULL,
     name text NOT NULL,
     image_url text NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -140,6 +106,7 @@ ALTER SEQUENCE accounts_id_seq OWNED BY accounts.id;
 
 CREATE TABLE ads (
     id integer NOT NULL,
+    account_id integer NOT NULL,
     campaign_id integer NOT NULL,
     name text NOT NULL,
     image_url text NOT NULL,
@@ -178,10 +145,11 @@ CREATE TABLE campaigns (
     id integer NOT NULL,
     account_id integer NOT NULL,
     name text NOT NULL,
-    cost_model campaign_cost_model NOT NULL,
-    state campaign_state NOT NULL,
+    cost_model text NOT NULL,
+    text text NOT NULL,
+    state text NOT NULL,
     budget integer,
-    budget_interval campaign_budget_interval,
+    budget_interval text,
     blacklisted_site_urls character varying[],
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -212,6 +180,8 @@ ALTER SEQUENCE campaigns_id_seq OWNED BY campaigns.id;
 --
 
 CREATE TABLE click_daily_rollups (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    account_id integer NOT NULL,
     ad_id integer NOT NULL,
     count bigint NOT NULL,
     date date NOT NULL
@@ -223,7 +193,8 @@ CREATE TABLE click_daily_rollups (
 --
 
 CREATE TABLE clicks (
-    click_id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    account_id integer NOT NULL,
     ad_id integer NOT NULL,
     clicked_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
@@ -238,6 +209,8 @@ CREATE TABLE clicks (
 --
 
 CREATE TABLE impression_daily_rollups (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    account_id integer NOT NULL,
     ad_id integer NOT NULL,
     count bigint NOT NULL,
     date date NOT NULL
@@ -249,7 +222,8 @@ CREATE TABLE impression_daily_rollups (
 --
 
 CREATE TABLE impressions (
-    impression_id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    account_id integer NOT NULL,
     ad_id integer NOT NULL,
     seen_at timestamp without time zone NOT NULL,
     site_url text NOT NULL,
@@ -266,6 +240,39 @@ CREATE TABLE impressions (
 CREATE TABLE schema_migrations (
     version character varying NOT NULL
 );
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE users (
+    id integer NOT NULL,
+    account_id integer NOT NULL,
+    encrypted_password text NOT NULL,
+    email text NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
@@ -290,6 +297,13 @@ ALTER TABLE ONLY campaigns ALTER COLUMN id SET DEFAULT nextval('campaigns_id_seq
 
 
 --
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
+
+
+--
 -- Name: accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -302,7 +316,7 @@ ALTER TABLE ONLY accounts
 --
 
 ALTER TABLE ONLY ads
-    ADD CONSTRAINT ads_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT ads_pkey PRIMARY KEY (account_id, id);
 
 
 --
@@ -310,7 +324,7 @@ ALTER TABLE ONLY ads
 --
 
 ALTER TABLE ONLY campaigns
-    ADD CONSTRAINT campaigns_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT campaigns_pkey PRIMARY KEY (account_id, id);
 
 
 --
@@ -318,7 +332,7 @@ ALTER TABLE ONLY campaigns
 --
 
 ALTER TABLE ONLY click_daily_rollups
-    ADD CONSTRAINT click_daily_rollups_pkey PRIMARY KEY (ad_id, date);
+    ADD CONSTRAINT click_daily_rollups_pkey PRIMARY KEY (account_id, ad_id, date, id);
 
 
 --
@@ -326,7 +340,7 @@ ALTER TABLE ONLY click_daily_rollups
 --
 
 ALTER TABLE ONLY clicks
-    ADD CONSTRAINT clicks_pkey PRIMARY KEY (click_id, ad_id);
+    ADD CONSTRAINT clicks_pkey PRIMARY KEY (account_id, id, ad_id);
 
 
 --
@@ -334,7 +348,7 @@ ALTER TABLE ONLY clicks
 --
 
 ALTER TABLE ONLY impression_daily_rollups
-    ADD CONSTRAINT impression_daily_rollups_pkey PRIMARY KEY (ad_id, date);
+    ADD CONSTRAINT impression_daily_rollups_pkey PRIMARY KEY (account_id, ad_id, date, id);
 
 
 --
@@ -342,7 +356,15 @@ ALTER TABLE ONLY impression_daily_rollups
 --
 
 ALTER TABLE ONLY impressions
-    ADD CONSTRAINT impressions_pkey PRIMARY KEY (impression_id, ad_id);
+    ADD CONSTRAINT impressions_pkey PRIMARY KEY (account_id, id, ad_id);
+
+
+--
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id);
 
 
 --
@@ -357,34 +379,6 @@ CREATE INDEX clicks_clicked_at_brin ON clicks USING brin (clicked_at);
 --
 
 CREATE INDEX impressions_seen_at_brin ON impressions USING brin (seen_at);
-
-
---
--- Name: index_ads_on_campaign_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_ads_on_campaign_id ON ads USING btree (campaign_id);
-
-
---
--- Name: index_campaigns_on_account_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_campaigns_on_account_id ON campaigns USING btree (account_id);
-
-
---
--- Name: index_clicks_on_ad_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_clicks_on_ad_id ON clicks USING btree (ad_id);
-
-
---
--- Name: index_impressions_on_ad_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_impressions_on_ad_id ON impressions USING btree (ad_id);
 
 
 --

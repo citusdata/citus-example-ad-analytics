@@ -1,7 +1,6 @@
 class Campaign < ActiveRecord::Base
   acts_as_distributed :account
 
-  belongs_to :account
   has_many :ads
 
   def impressions

@@ -2,33 +2,37 @@ class InitialTables < ActiveRecord::Migration
   def up
     enable_extension 'uuid-ossp'
 
-    execute <<-SQL
-    CREATE TYPE campaign_cost_model AS ENUM ('cost_per_click', 'cost_per_impression');
-    CREATE TYPE campaign_state AS ENUM ('paused', 'running', 'archived');
-    CREATE TYPE campaign_budget_interval AS ENUM ('daily', 'weekly', 'monthly');
-    SQL
+    # execute <<-SQL
+    # CREATE TYPE campaign_cost_model AS ENUM ('cost_per_click', 'cost_per_impression');
+    # CREATE TYPE campaign_state AS ENUM ('paused', 'running', 'archived');
+    # CREATE TYPE campaign_budget_interval AS ENUM ('daily', 'weekly', 'monthly');
+    # SQL
 
-    create_table :accounts do |t|
+    create_table :users do |t|
+      t.references :account, null: false
       t.text :encrypted_password, null: false
-      t.text :name, null: false
-      t.text :image_url, null: false
-
+      t.text :email, null: false, unique: true
       t.timestamps null: false
     end
 
-    create_table :account_emails do |t|
-      t.references :account, null: false
-      t.text :email, null: false, unique: true
+    create_table :accounts do |t|
+      t.text :name, null: false
+      t.text :image_url, null: false
+      t.timestamps null: false
     end
 
     create_table :campaigns do |t|
       t.references :account, null: false
 
       t.text :name, null: false
-      t.column :cost_model, :campaign_cost_model, null: false
-      t.column :state, :campaign_state, null: false
+      # TODO: Need to push down the type creation
+      #t.column :cost_model, :campaign_cost_model, null: false
+      #t.column :state, :campaign_state, null: false
+      #t.column :budget_interval, :campaign_budget_interval, null: true
+      t.text :cost_model, :text, null: false
+      t.text :state, null: false
       t.integer :budget, null: true
-      t.column :budget_interval, :campaign_budget_interval, null: true
+      t.text :budget_interval, null: true
       t.string :blacklisted_site_urls, array: true
 
       t.timestamps null: false
@@ -98,6 +102,7 @@ class InitialTables < ActiveRecord::Migration
 
     # DROP TABLE statements can't run in a transaction block (Citus #774)
     execute 'COMMIT'
+    drop_table :users
     drop_table :accounts
     drop_table :campaigns
     drop_table :ads

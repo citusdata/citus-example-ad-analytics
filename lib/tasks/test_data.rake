@@ -69,10 +69,8 @@ namespace :test_data do
         domain_name = Faker::Internet.domain_name
 
         rand(ad_count_range).times do
-          # Workaround for https://github.com/citusdata/citus/issues/687
-          ad_id = Ad.connection.select_value("SELECT nextval('ads_id_seq'::regclass)")
 
-          ad = campaign.ads.create! id: ad_id, name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
+          ad = campaign.ads.create! name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
                                     target_url: Faker::Internet.url(domain_name)
 
           puts "  Ad ##{ad.id}"
