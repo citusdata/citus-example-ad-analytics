@@ -1,12 +1,12 @@
 # rubocop:disable all
 
-def generate_fake_impressions(ad_id, impression_count, user_ips, ts_start, ts_end, cost_model)
+def generate_fake_impressions(account_id, ad_id, impression_count, user_ips, ts_start, ts_end, cost_model)
   cpi_amount_range = rand(0.001..0.01)
 
-  count = Impression.copy_from_client [:ad_id, :seen_at, :site_url, :user_ip, :user_data, :cost_per_impression_usd] do |copy|
+  count = Impression.copy_from_client [:account_id, :ad_id, :seen_at, :site_url, :user_ip, :user_data, :cost_per_impression_usd] do |copy|
     impression_count.times do |impression_num|
       print "  -> Generating impressions: #{impression_num}\r"
-      copy << [ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips[impression_num],
+      copy << [account_id, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips[impression_num],
                { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
                cost_model == 'cost_per_impression' ? rand(cpi_amount_range) : nil]
     end
@@ -15,13 +15,13 @@ def generate_fake_impressions(ad_id, impression_count, user_ips, ts_start, ts_en
   puts "  -> Generated #{count} impressions" + " " * 10
 end
 
-def generate_fake_clicks(ad_id, click_count, user_ips, ts_start, ts_end, cost_model)
+def generate_fake_clicks(account_id, ad_id, click_count, user_ips, ts_start, ts_end, cost_model)
   cpc_amount_range = rand(1.0..5.0)
 
-  count = Click.copy_from_client [:ad_id, :clicked_at, :site_url, :user_ip, :user_data, :cost_per_click_usd] do |copy|
+  count = Click.copy_from_client [:account_id, :ad_id, :clicked_at, :site_url, :user_ip, :user_data, :cost_per_click_usd] do |copy|
     click_count.times do |click_num|
       print "  -> Generating clicks: #{click_num}\r"
-      copy << [ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips.sample,
+      copy << [account_id, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips.sample,
                { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
                  cost_model == 'cost_per_click' ? rand(cpc_amount_range) : nil]
     end
@@ -33,8 +33,8 @@ end
 def generate_fake_data_for_ad(ad, impression_count:, click_count:, ts_start:, ts_end:)
   user_ips = impression_count.times.map { Faker::Internet.ip_v4_address }
 
-  generate_fake_impressions(ad.id, impression_count, user_ips, ts_start, ts_end, ad.campaign.cost_model)
-  generate_fake_clicks(ad.id, click_count, user_ips, ts_start, ts_end, ad.campaign.cost_model)
+  generate_fake_impressions(ad.account_id, ad.id, impression_count, user_ips, ts_start, ts_end, ad.campaign.cost_model)
+  generate_fake_clicks(ad.account_id, ad.id, click_count, user_ips, ts_start, ts_end, ad.campaign.cost_model)
 
   # Update counter cache and touch manually since we're using COPY
   ad.update! impressions_count: ad.impressions_count + impression_count,
@@ -57,7 +57,8 @@ namespace :test_data do
     rand(account_count_range).times do
       puts ''
 
-      account = Account.create! name: Faker::Name.name, email: Faker::Internet.email, password: Faker::Internet.password, image_url: Faker::Avatar.image
+      account = Account.create! name: Faker::Name.name, image_url: Faker::Avatar.image
+      user = account.users.create! email: Faker::Internet.email, password: Faker::Internet.password
 
       rand(campaign_count_range).times do
         campaign = account.campaigns.create! name: Faker::Superhero.name,
@@ -70,7 +71,7 @@ namespace :test_data do
 
         rand(ad_count_range).times do
 
-          ad = campaign.ads.create! name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
+          ad = campaign.ads.create! account: account, name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
                                     target_url: Faker::Internet.url(domain_name)
 
           puts "  Ad ##{ad.id}"

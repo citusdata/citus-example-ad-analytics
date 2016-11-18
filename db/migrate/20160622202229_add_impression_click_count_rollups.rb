@@ -19,16 +19,11 @@ class AddImpressionClickCountRollups < ActiveRecord::Migration
     execute "ALTER TABLE click_daily_rollups DROP CONSTRAINT click_daily_rollups_pkey"
     execute "ALTER TABLE click_daily_rollups ADD PRIMARY KEY(account_id, ad_id, date, id)"
 
-    execute "SELECT master_create_distributed_table('impression_daily_rollups', 'account_id', 'hash')"
-    execute "SELECT master_create_distributed_table('click_daily_rollups', 'account_id', 'hash')"
-    execute "SELECT master_create_worker_shards('impression_daily_rollups', 16, 1)"
-    execute "SELECT master_create_worker_shards('click_daily_rollups', 16, 1)"
+    create_distributed_table :impression_daily_rollups, :account_id
+    create_distributed_table :click_daily_rollups, :account_id
 
-    # DDL can't run within a transaction (Citus #668)
-    execute 'COMMIT'
     execute "CREATE INDEX impressions_seen_at_brin ON impressions USING brin(seen_at)"
     execute "CREATE INDEX clicks_clicked_at_brin ON clicks USING brin(clicked_at)"
-    execute 'BEGIN'
   end
 
   def down

@@ -1,12 +1,11 @@
 class InitialTables < ActiveRecord::Migration
   def up
-    enable_extension 'uuid-ossp'
+    enable_citus_tools
+    enable_extension_on_all_nodes 'uuid-ossp'
 
-    # execute <<-SQL
-    # CREATE TYPE campaign_cost_model AS ENUM ('cost_per_click', 'cost_per_impression');
-    # CREATE TYPE campaign_state AS ENUM ('paused', 'running', 'archived');
-    # CREATE TYPE campaign_budget_interval AS ENUM ('daily', 'weekly', 'monthly');
-    # SQL
+    execute_on_all_nodes "CREATE TYPE campaign_cost_model AS ENUM ('cost_per_click', 'cost_per_impression')"
+    execute_on_all_nodes "CREATE TYPE campaign_state AS ENUM ('paused', 'running', 'archived')"
+    execute_on_all_nodes "CREATE TYPE campaign_budget_interval AS ENUM ('daily', 'weekly', 'monthly')"
 
     create_table :users do |t|
       t.references :account, null: false
@@ -25,14 +24,10 @@ class InitialTables < ActiveRecord::Migration
       t.references :account, null: false
 
       t.text :name, null: false
-      # TODO: Need to push down the type creation
-      #t.column :cost_model, :campaign_cost_model, null: false
-      #t.column :state, :campaign_state, null: false
-      #t.column :budget_interval, :campaign_budget_interval, null: true
-      t.text :cost_model, :text, null: false
-      t.text :state, null: false
+      t.column :cost_model, :campaign_cost_model, null: false
+      t.column :state, :campaign_state, null: false
+      t.column :budget_interval, :campaign_budget_interval, null: true
       t.integer :budget, null: true
-      t.text :budget_interval, null: true
       t.string :blacklisted_site_urls, array: true
 
       t.timestamps null: false
@@ -85,24 +80,18 @@ class InitialTables < ActiveRecord::Migration
     execute "ALTER TABLE clicks DROP CONSTRAINT clicks_pkey"
     execute "ALTER TABLE clicks ADD PRIMARY KEY (account_id, id, ad_id)"
 
-    execute "SELECT master_create_distributed_table('accounts', 'id', 'hash')"
-    execute "SELECT master_create_distributed_table('campaigns', 'account_id', 'hash')"
-    execute "SELECT master_create_distributed_table('ads', 'account_id', 'hash')"
-    execute "SELECT master_create_distributed_table('impressions', 'account_id', 'hash')"
-    execute "SELECT master_create_distributed_table('clicks', 'account_id', 'hash')"
-    execute "SELECT master_create_worker_shards('accounts', 16, 1)"
-    execute "SELECT master_create_worker_shards('campaigns', 16, 1)"
-    execute "SELECT master_create_worker_shards('ads', 16, 1)"
-    execute "SELECT master_create_worker_shards('impressions', 16, 1)"
-    execute "SELECT master_create_worker_shards('clicks', 16, 1)"
+    create_distributed_table :accounts, :id
+    create_distributed_table :campaigns, :account_id
+    create_distributed_table :ads, :account_id
+    create_distributed_table :impressions, :account_id
+    create_distributed_table :clicks, :account_id
   end
 
   def down
-    drop_table :account_emails
+    drop_table :users
 
     # DROP TABLE statements can't run in a transaction block (Citus #774)
     execute 'COMMIT'
-    drop_table :users
     drop_table :accounts
     drop_table :campaigns
     drop_table :ads
@@ -110,10 +99,8 @@ class InitialTables < ActiveRecord::Migration
     drop_table :clicks
     execute 'BEGIN'
 
-    execute <<-SQL
-    DROP TYPE campaign_cost_model;
-    DROP TYPE campaign_state;
-    DROP TYPE campaign_budget_interval;
-    SQL
+    execute_on_all_nodes 'DROP TYPE campaign_cost_model'
+    execute_on_all_nodes 'DROP TYPE campaign_state'
+    execute_on_all_nodes 'DROP TYPE campaign_budget_interval'
   end
 end

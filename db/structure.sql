@@ -2,23 +2,17 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.4
--- Dumped by pg_dump version 9.5.2
+-- Dumped from database version 9.6.1
+-- Dumped by pg_dump version 9.6.1
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: postgres; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON DATABASE postgres IS 'default administrative connection database';
-
 
 --
 -- Name: citus; Type: EXTENSION; Schema: -; Owner: -
@@ -49,6 +43,230 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
+-- Name: btree_gin; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS btree_gin WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION btree_gin; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION btree_gin IS 'support for indexing common datatypes in GIN';
+
+
+--
+-- Name: btree_gist; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION btree_gist; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION btree_gist IS 'support for indexing common datatypes in GiST';
+
+
+--
+-- Name: citext; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION citext; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION citext IS 'data type for case-insensitive character strings';
+
+
+--
+-- Name: cube; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS cube WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION cube; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION cube IS 'data type for multidimensional cubes';
+
+
+--
+-- Name: dblink; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS dblink WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION dblink; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION dblink IS 'connect to other PostgreSQL databases from within a database';
+
+
+--
+-- Name: earthdistance; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS earthdistance WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION earthdistance; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION earthdistance IS 'calculate great-circle distances on the surface of the Earth';
+
+
+--
+-- Name: hll; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS hll WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION hll; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION hll IS 'type for storing hyperloglog data';
+
+
+--
+-- Name: hstore; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION hstore; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION hstore IS 'data type for storing sets of (key, value) pairs';
+
+
+--
+-- Name: intarray; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS intarray WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION intarray; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION intarray IS 'functions, operators, and index support for 1-D arrays of integers';
+
+
+--
+-- Name: pg_prewarm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_prewarm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_prewarm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_prewarm IS 'prewarm relation data';
+
+
+--
+-- Name: pg_stat_statements; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_stat_statements IS 'track execution statistics of all SQL statements executed';
+
+
+--
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
+--
+-- Name: session_analytics; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS session_analytics WITH SCHEMA public;
+
+
+--
+-- Name: shard_rebalancer; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS shard_rebalancer WITH SCHEMA public;
+
+
+--
+-- Name: sslinfo; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS sslinfo WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION sslinfo; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION sslinfo IS 'information about SSL certificates';
+
+
+--
+-- Name: unaccent; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION unaccent IS 'text search dictionary that removes accents';
+
+
+--
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -62,7 +280,85 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
 
 
+--
+-- Name: xml2; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS xml2 WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION xml2; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION xml2 IS 'XPath querying and XSLT';
+
+
 SET search_path = public, pg_catalog;
+
+--
+-- Name: campaign_budget_interval; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE campaign_budget_interval AS ENUM (
+    'daily',
+    'weekly',
+    'monthly'
+);
+
+
+--
+-- Name: campaign_cost_model; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE campaign_cost_model AS ENUM (
+    'cost_per_click',
+    'cost_per_impression'
+);
+
+
+--
+-- Name: campaign_state; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE campaign_state AS ENUM (
+    'paused',
+    'running',
+    'archived'
+);
+
+
+--
+-- Name: citus_run_on_all_workers(text, boolean); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION citus_run_on_all_workers(command text, parallel boolean DEFAULT true, OUT nodename text, OUT nodeport integer, OUT success boolean, OUT result text) RETURNS SETOF record
+    LANGUAGE plpgsql
+    AS $$
+      DECLARE
+      	workers text[];
+      	ports int[];
+      	commands text[];
+      BEGIN
+      	WITH citus_workers AS (
+      		SELECT * FROM master_get_active_worker_nodes() ORDER BY node_name, node_port)
+      	SELECT array_agg(node_name), array_agg(node_port), array_agg(command)
+      	INTO workers, ports, commands
+      	FROM citus_workers;
+
+      	RETURN QUERY SELECT * FROM master_run_on_worker(workers, ports, commands, parallel);
+      END;
+      $$;
+
+
+--
+-- Name: master_run_on_worker(text[], integer[], text[], boolean); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION master_run_on_worker(worker_name text[], port integer[], command text[], parallel boolean, OUT node_name text, OUT node_port integer, OUT success boolean, OUT result text) RETURNS SETOF record
+    LANGUAGE c STABLE STRICT
+    AS 'citus.so', 'master_run_on_worker';
+
 
 SET default_tablespace = '';
 
@@ -145,11 +441,10 @@ CREATE TABLE campaigns (
     id integer NOT NULL,
     account_id integer NOT NULL,
     name text NOT NULL,
-    cost_model text NOT NULL,
-    text text NOT NULL,
-    state text NOT NULL,
+    cost_model campaign_cost_model NOT NULL,
+    state campaign_state NOT NULL,
+    budget_interval campaign_budget_interval,
     budget integer,
-    budget_interval text,
     blacklisted_site_urls character varying[],
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -276,35 +571,35 @@ ALTER SEQUENCE users_id_seq OWNED BY users.id;
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: accounts id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY accounts ALTER COLUMN id SET DEFAULT nextval('accounts_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: ads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ads ALTER COLUMN id SET DEFAULT nextval('ads_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: campaigns id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY campaigns ALTER COLUMN id SET DEFAULT nextval('campaigns_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users ALTER COLUMN id SET DEFAULT nextval('users_id_seq'::regclass);
 
 
 --
--- Name: accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: accounts accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY accounts
@@ -312,7 +607,7 @@ ALTER TABLE ONLY accounts
 
 
 --
--- Name: ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: ads ads_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY ads
@@ -320,7 +615,7 @@ ALTER TABLE ONLY ads
 
 
 --
--- Name: campaigns_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: campaigns campaigns_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY campaigns
@@ -328,7 +623,7 @@ ALTER TABLE ONLY campaigns
 
 
 --
--- Name: click_daily_rollups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: click_daily_rollups click_daily_rollups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY click_daily_rollups
@@ -336,7 +631,7 @@ ALTER TABLE ONLY click_daily_rollups
 
 
 --
--- Name: clicks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: clicks clicks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY clicks
@@ -344,7 +639,7 @@ ALTER TABLE ONLY clicks
 
 
 --
--- Name: impression_daily_rollups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: impression_daily_rollups impression_daily_rollups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY impression_daily_rollups
@@ -352,7 +647,7 @@ ALTER TABLE ONLY impression_daily_rollups
 
 
 --
--- Name: impressions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: impressions impressions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY impressions
@@ -360,7 +655,7 @@ ALTER TABLE ONLY impressions
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users
