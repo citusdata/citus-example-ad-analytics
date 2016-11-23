@@ -14,13 +14,13 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :accounts do |t|
+    create_table :accounts, partition_key: :id do |t|
       t.text :name, null: false
       t.text :image_url, null: false
       t.timestamps null: false
     end
 
-    create_table :campaigns do |t|
+    create_table :campaigns, partition_key: :account_id do |t|
       t.references :account, null: false
 
       t.text :name, null: false
@@ -33,7 +33,7 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :ads do |t|
+    create_table :ads, partition_key: :account_id do |t|
       t.references :account, null: false
       t.references :campaign, null: false
 
@@ -47,10 +47,10 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :impressions, id: :uuid do |t|
+    create_table :impressions, id: :uuid, partition_key: :account_id do |t|
       t.references :account, null: false
       t.references :ad, null: false
-      t.timestamp :seen_at, null: false
+      t.timestamp :seen_at, null: false, index: true
 
       t.text :site_url, null: false
       t.decimal :cost_per_impression_usd, precision: 20, scale: 10, null: true
@@ -59,10 +59,10 @@ class InitialTables < ActiveRecord::Migration
       t.jsonb :user_data, null: false # agent, is_mobile, location
     end
 
-    create_table :clicks, id: :uuid do |t|
+    create_table :clicks, id: :uuid, partition_key: :account_id do |t|
       t.references :account, null: false
       t.references :ad, null: false
-      t.timestamp :clicked_at, null: false
+      t.timestamp :clicked_at, null: false, index: true
 
       t.text :site_url, null: false
       t.decimal :cost_per_click_usd, precision: 20, scale: 10, null: true
@@ -70,15 +70,6 @@ class InitialTables < ActiveRecord::Migration
       t.inet :user_ip, null: false
       t.jsonb :user_data, null: false # agent, is_mobile, location
     end
-
-    execute "ALTER TABLE campaigns DROP CONSTRAINT campaigns_pkey"
-    execute "ALTER TABLE campaigns ADD PRIMARY KEY (account_id, id)"
-    execute "ALTER TABLE ads DROP CONSTRAINT ads_pkey"
-    execute "ALTER TABLE ads ADD PRIMARY KEY (account_id, id)"
-    execute "ALTER TABLE impressions DROP CONSTRAINT impressions_pkey"
-    execute "ALTER TABLE impressions ADD PRIMARY KEY (account_id, id, ad_id)"
-    execute "ALTER TABLE clicks DROP CONSTRAINT clicks_pkey"
-    execute "ALTER TABLE clicks ADD PRIMARY KEY (account_id, id, ad_id)"
 
     create_distributed_table :accounts, :id
     create_distributed_table :campaigns, :account_id

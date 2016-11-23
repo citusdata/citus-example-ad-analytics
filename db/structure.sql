@@ -336,17 +336,17 @@ CREATE FUNCTION citus_run_on_all_workers(command text, parallel boolean DEFAULT 
     LANGUAGE plpgsql
     AS $$
       DECLARE
-      	workers text[];
-      	ports int[];
-      	commands text[];
+        workers text[];
+        ports int[];
+        commands text[];
       BEGIN
-      	WITH citus_workers AS (
-      		SELECT * FROM master_get_active_worker_nodes() ORDER BY node_name, node_port)
-      	SELECT array_agg(node_name), array_agg(node_port), array_agg(command)
-      	INTO workers, ports, commands
-      	FROM citus_workers;
+        WITH citus_workers AS (
+          SELECT * FROM master_get_active_worker_nodes() ORDER BY node_name, node_port)
+        SELECT array_agg(node_name), array_agg(node_port), array_agg(command)
+        INTO workers, ports, commands
+        FROM citus_workers;
 
-      	RETURN QUERY SELECT * FROM master_run_on_worker(workers, ports, commands, parallel);
+        RETURN QUERY SELECT * FROM master_run_on_worker(workers, ports, commands, parallel);
       END;
       $$;
 
@@ -611,7 +611,7 @@ ALTER TABLE ONLY accounts
 --
 
 ALTER TABLE ONLY ads
-    ADD CONSTRAINT ads_pkey PRIMARY KEY (account_id, id);
+    ADD CONSTRAINT ads_pkey PRIMARY KEY (id, account_id);
 
 
 --
@@ -619,7 +619,7 @@ ALTER TABLE ONLY ads
 --
 
 ALTER TABLE ONLY campaigns
-    ADD CONSTRAINT campaigns_pkey PRIMARY KEY (account_id, id);
+    ADD CONSTRAINT campaigns_pkey PRIMARY KEY (id, account_id);
 
 
 --
@@ -627,7 +627,7 @@ ALTER TABLE ONLY campaigns
 --
 
 ALTER TABLE ONLY click_daily_rollups
-    ADD CONSTRAINT click_daily_rollups_pkey PRIMARY KEY (account_id, ad_id, date, id);
+    ADD CONSTRAINT click_daily_rollups_pkey PRIMARY KEY (id, account_id);
 
 
 --
@@ -635,7 +635,7 @@ ALTER TABLE ONLY click_daily_rollups
 --
 
 ALTER TABLE ONLY clicks
-    ADD CONSTRAINT clicks_pkey PRIMARY KEY (account_id, id, ad_id);
+    ADD CONSTRAINT clicks_pkey PRIMARY KEY (id, account_id);
 
 
 --
@@ -643,7 +643,7 @@ ALTER TABLE ONLY clicks
 --
 
 ALTER TABLE ONLY impression_daily_rollups
-    ADD CONSTRAINT impression_daily_rollups_pkey PRIMARY KEY (account_id, ad_id, date, id);
+    ADD CONSTRAINT impression_daily_rollups_pkey PRIMARY KEY (id, account_id);
 
 
 --
@@ -651,7 +651,7 @@ ALTER TABLE ONLY impression_daily_rollups
 --
 
 ALTER TABLE ONLY impressions
-    ADD CONSTRAINT impressions_pkey PRIMARY KEY (account_id, id, ad_id);
+    ADD CONSTRAINT impressions_pkey PRIMARY KEY (id, account_id);
 
 
 --
@@ -663,17 +663,17 @@ ALTER TABLE ONLY users
 
 
 --
--- Name: clicks_clicked_at_brin; Type: INDEX; Schema: public; Owner: -
+-- Name: index_clicks_on_clicked_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX clicks_clicked_at_brin ON clicks USING brin (clicked_at);
+CREATE INDEX index_clicks_on_clicked_at ON clicks USING btree (clicked_at);
 
 
 --
--- Name: impressions_seen_at_brin; Type: INDEX; Schema: public; Owner: -
+-- Name: index_impressions_on_seen_at; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX impressions_seen_at_brin ON impressions USING brin (seen_at);
+CREATE INDEX index_impressions_on_seen_at ON impressions USING btree (seen_at);
 
 
 --
