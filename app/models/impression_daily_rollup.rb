@@ -1,5 +1,5 @@
 class ImpressionDailyRollup < ActiveRecord::Base
-  acts_as_distributed :account
+  multi_tenant :account
 
   belongs_to :ad
 end

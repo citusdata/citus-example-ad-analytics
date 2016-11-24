@@ -1,6 +1,5 @@
 class Campaign < ActiveRecord::Base
-  acts_as_distributed :account
-  self.primary_key = :id
+  multi_tenant :account
 
   has_many :ads
 

@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'rails', '4.2.7'
 gem 'pg'
 gem 'puma'
-gem 'citus-rails', path: '~/Code/citus/citus-rails'
+gem 'activerecord-multi-tenant', path: '~/Code/activerecord-multi-tenant'#, github: 'citusdata/activerecord-multi-tenant'
 
 gem 'faker'
 gem 'devise'

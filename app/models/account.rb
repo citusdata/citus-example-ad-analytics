@@ -1,5 +1,5 @@
 class Account < ActiveRecord::Base
-  acts_as_distributed :account
+  multi_tenant :account
 
   has_many :campaigns
   has_many :users

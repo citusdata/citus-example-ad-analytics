@@ -1,5 +1,5 @@
 class Ad < ActiveRecord::Base
-  acts_as_distributed :account
+  multi_tenant :account
 
   belongs_to :campaign
   has_many :clicks, dependent: :delete_all
