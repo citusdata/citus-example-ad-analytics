@@ -1,6 +1,5 @@
 class InitialTables < ActiveRecord::Migration
   def up
-    enable_citus_tools
     enable_extension_on_all_nodes 'uuid-ossp'
 
     execute_on_all_nodes "CREATE TYPE campaign_cost_model AS ENUM ('cost_per_click', 'cost_per_impression')"

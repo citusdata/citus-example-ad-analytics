@@ -6,12 +6,6 @@ GIT
       coffee-rails (>= 3.2.1)
       railties (>= 3.0, < 5.0)
 
-PATH
-  remote: ~/Code/activerecord-multi-tenant
-  specs:
-    activerecord-multi-tenant (0.2.0)
-      acts_as_tenant
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -44,6 +38,8 @@ GEM
       activemodel (= 4.2.7)
       activesupport (= 4.2.7)
       arel (~> 6.0)
+    activerecord-multi-tenant (0.2.0)
+      acts_as_tenant
     activesupport (4.2.7)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
@@ -168,7 +164,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord-multi-tenant!
+  activerecord-multi-tenant
   bootstrap-sass
   devise
   dotenv-rails
@@ -183,4 +179,4 @@ DEPENDENCIES
   uglifier (>= 1.3.0)
 
 BUNDLED WITH
-   1.13.6
+   1.13.7
