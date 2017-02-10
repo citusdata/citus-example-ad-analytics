@@ -13,13 +13,13 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :accounts, partition_key: :id do |t|
+    create_table :accounts, id: :bigserial, partition_key: :id do |t|
       t.text :name, null: false
       t.text :image_url, null: false
       t.timestamps null: false
     end
 
-    create_table :campaigns, partition_key: :account_id do |t|
+    create_table :campaigns, id: :bigserial, partition_key: :account_id do |t|
       t.references :account, null: false
 
       t.text :name, null: false
@@ -32,7 +32,7 @@ class InitialTables < ActiveRecord::Migration
       t.timestamps null: false
     end
 
-    create_table :ads, partition_key: :account_id do |t|
+    create_table :ads, id: :bigserial, partition_key: :account_id do |t|
       t.references :account, null: false
       t.references :campaign, null: false
 
