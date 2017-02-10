@@ -3,7 +3,6 @@ default: &default
   url: <%= ENV['DATABASE_URL'] %>
   pool: 5
   timeout: 5000
-  prepared_statements: false
 
 development:
   <<: *default
