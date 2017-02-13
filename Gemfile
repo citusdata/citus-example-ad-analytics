@@ -4,6 +4,7 @@ gem 'rails', '4.2.7'
 gem 'pg'
 gem 'puma'
 gem 'activerecord-multi-tenant'
+gem 'activerecord-clean-db-structure'
 
 gem 'faker'
 gem 'devise'

@@ -38,6 +38,8 @@ GEM
       activemodel (= 4.2.7)
       activesupport (= 4.2.7)
       arel (~> 6.0)
+    activerecord-clean-db-structure (0.1.0)
+      rails (>= 4.2)
     activerecord-multi-tenant (0.3.0)
       rails (>= 3.1)
       request_store (>= 1.0.5)
@@ -160,6 +162,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord-clean-db-structure
   activerecord-multi-tenant
   bootstrap-sass
   devise
