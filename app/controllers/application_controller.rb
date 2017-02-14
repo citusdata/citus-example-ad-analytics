@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
   set_current_tenant_through_filter
-  before_filter :set_current_account
+  before_filter :set_current_company
 
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
@@ -18,11 +18,11 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def current_account
-    @current_account ||= Account.find(1)
+  def current_company
+    @current_company ||= Company.find(1)
   end
 
-  def set_current_account
-    set_current_tenant(current_account)
+  def set_current_company
+    set_current_tenant(current_company)
   end
 end

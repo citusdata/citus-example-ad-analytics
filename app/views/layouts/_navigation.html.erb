@@ -40,10 +40,10 @@
   <section class="sidebar">
     <div class="user-panel">
       <div class="pull-left image">
-        <%= image_tag current_account.image_url, class: 'img-circle', style: 'background-color: white' %>
+        <%= image_tag current_company.image_url, class: 'img-circle', style: 'background-color: white' %>
       </div>
       <div class="pull-left info">
-        <p><%= current_account.name %></p>
+        <p><%= current_company.name %></p>
         <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
       </div>
     </div>
@@ -51,7 +51,7 @@
     <ul class="sidebar-menu">
       <li class="header">HEADER</li>
       <li class="active"><a href="/"><i class="fa fa-bullseye"></i> <span>All Campaigns</span></a></li>
-      <% current_account.campaigns.includes(:ads).each do |campaign| %>
+      <% current_company.campaigns.includes(:ads).each do |campaign| %>
         <li class="treeview">
           <a href="#">
             <i class="fa fa-bar-chart"></i>

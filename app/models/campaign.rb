@@ -1,5 +1,5 @@
 class Campaign < ActiveRecord::Base
-  multi_tenant :account
+  multi_tenant :company
 
   has_many :ads
 

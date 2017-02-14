@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-  belongs_to :account
+  belongs_to :company
 
   devise :database_authenticatable, :registerable, :validatable
 end
