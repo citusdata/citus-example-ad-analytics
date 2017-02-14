@@ -1,5 +1,5 @@
 module ApplicationHelper
-  def current_account
-    Account.first
+  def current_company
+    Company.first
   end
 end

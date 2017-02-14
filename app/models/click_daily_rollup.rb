@@ -1,5 +1,5 @@
 class ClickDailyRollup < ActiveRecord::Base
-  multi_tenant :account
+  multi_tenant :company
 
   belongs_to :ad
 end
