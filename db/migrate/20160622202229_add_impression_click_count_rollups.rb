@@ -19,10 +19,7 @@ class AddImpressionClickCountRollups < ActiveRecord::Migration
   end
 
   def down
-    # DROP TABLE statements can't run in a transaction block (Citus #774)
-    execute 'COMMIT'
     drop_table :impression_daily_rollups
     drop_table :click_daily_rollups
-    execute 'BEGIN'
   end
 end

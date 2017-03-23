@@ -77,14 +77,16 @@ class InitialTables < ActiveRecord::Migration
 
   def down
     drop_table :users
-
-    # DROP TABLE statements can't run in a transaction block (Citus #774)
-    execute 'COMMIT'
     drop_table :companies
     drop_table :campaigns
     drop_table :ads
     drop_table :impressions
     drop_table :clicks
+
+    # Due to the above tables depending on the below types, we need to commit th
+    # table change first, before we can use execute_on_all_nodes, which uses a
+    # different connection
+    execute 'COMMIT'
     execute 'BEGIN'
 
     execute_on_all_nodes 'DROP TYPE campaign_cost_model'
