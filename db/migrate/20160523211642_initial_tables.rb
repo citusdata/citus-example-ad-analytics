@@ -91,6 +91,5 @@ class InitialTables < ActiveRecord::Migration
 
     execute_on_all_nodes 'DROP TYPE campaign_cost_model'
     execute_on_all_nodes 'DROP TYPE campaign_state'
-    execute_on_all_nodes 'DROP TYPE campaign_budget_interval'
   end
 end
