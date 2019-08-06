@@ -4,8 +4,6 @@
 
 Example app that uses the distributed Citus database to provide a realtime ad analytics dashboard.
 
-You can see the deployed version at http://citus-example-ad-analytics.herokuapp.com/
-
 ## Deploying on Citus Cloud and Heroku
 
 1. Signup for a Citus Cloud account: https://console.citusdata.com/users/sign_up
