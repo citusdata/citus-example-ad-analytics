@@ -158,6 +158,6 @@ The distributed EXPLAIN output for this query shows how it uses the lossy BRIN i
 
 ## LICENSE
 
-Copyright (c) 2016, Citus Data Inc
+Copyright (c) 2023, Citus Data Inc
 
 Licensed under the MIT license - feel free to incorporate the code in your own projects!
