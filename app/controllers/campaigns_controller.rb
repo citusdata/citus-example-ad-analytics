@@ -1,5 +1,6 @@
 class CampaignsController < ApplicationController
   def index
+    puts "campaigns current_company: #{current_company.id}"
     @campaigns = current_company.campaigns.includes(:ads)
 
     # Load historic COUNT from the roll-up tables

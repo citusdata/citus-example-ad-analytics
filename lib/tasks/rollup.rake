@@ -7,16 +7,16 @@ namespace :rollup do
     ads.each do |ad|
       print '.'
 
-      ImpressionDailyRollup.copy_from_client [:ad_id, :count, :date] do |copy|
-        Impression.connection.select_rows(%{SELECT date_trunc('day', seen_at), COUNT(*) FROM impressions WHERE ad_id = '#{ad.id}' GROUP BY 1}).each do |date, count|
-          copy << [ad.id, count.to_i, date]
-        end
+      Impression.connection.select_rows(%{SELECT date_trunc('day', seen_at), COUNT(*) FROM impressions WHERE ad_id = '#{ad.id}' GROUP BY 1}).each do |date, count|
+        puts " Impression ##{ad.id} #{date} #{count}"
+        impression = ImpressionDailyRollup.create(ad_id: ad.id, company_id: ad.company_id, count: count.to_i, date: date)
+        puts impression.inspect
       end
 
-      ClickDailyRollup.copy_from_client [:ad_id, :count, :date] do |copy|
-        Click.connection.select_rows(%{SELECT date_trunc('day', clicked_at), COUNT(*) FROM clicks WHERE ad_id = '#{ad.id}' GROUP BY 1}).each do |date, count|
-          copy << [ad.id, count.to_i, date]
-        end
+      Click.connection.select_rows(%{SELECT date_trunc('day', clicked_at), COUNT(*) FROM clicks WHERE ad_id = '#{ad.id}' GROUP BY 1}).each do |date, count|
+        puts " Click ##{ad.id} #{date} #{count}"
+        click = ClickDailyRollup.create(ad_id: ad.id, company_id: ad.company_id, count: count.to_i, date: date)
+        puts click.inspect
       end
     end
   end

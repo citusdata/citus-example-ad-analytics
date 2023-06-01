@@ -1,14 +1,26 @@
 default: &default
   adapter: postgresql
-  url: <%= ENV['DATABASE_URL'] %>
-  prepared_statements: false
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: postgres
+  password: postgres
+  port: 5600
+  host: localhost
+  timeout: 5000
+  variables:
+    citus.shard_count: 5
 
 development:
   <<: *default
+  database: postgres
 
 test:
   <<: *default
-  url: <%= (ENV['DATABASE_URL'] + '_test') if ENV['DATABASE_URL'].present?%>
+  database: postgres
 
 production:
   <<: *default
+  database: postgres
+  username: postgres
+  password: postgres
+  host: localhost

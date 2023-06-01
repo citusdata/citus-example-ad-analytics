@@ -1,9 +1,7 @@
-class InitialTables < ActiveRecord::Migration
+class InitialTables < ActiveRecord::Migration[7.0]
   def up
-    enable_extension_on_all_nodes 'uuid-ossp'
-
-    execute_on_all_nodes "CREATE TYPE campaign_cost_model AS ENUM ('cost_per_click', 'cost_per_impression')"
-    execute_on_all_nodes "CREATE TYPE campaign_state AS ENUM ('paused', 'running', 'archived')"
+    execute "CREATE TYPE campaign_cost_model AS ENUM ('cost_per_click', 'cost_per_impression')"
+    execute "CREATE TYPE campaign_state AS ENUM ('paused', 'running', 'archived')"
 
     create_table :users do |t|
       t.references :company, null: false

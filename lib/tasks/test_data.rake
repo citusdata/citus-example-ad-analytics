@@ -6,7 +6,7 @@ def generate_fake_impressions(company_id, ad_id, impression_count, user_ips, ts_
   count = Impression.copy_from_client [:company_id, :ad_id, :seen_at, :site_url, :user_ip, :user_data, :cost_per_impression_usd] do |copy|
     impression_count.times do |impression_num|
       print "  -> Generating impressions: #{impression_num}\r"
-      copy << [company_id, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips[impression_num],
+      copy << [company_id, ad_id, Faker::Time.between(from:ts_start, to:ts_end), Faker::Internet.url, user_ips[impression_num],
                { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
                cost_model == 'cost_per_impression' ? rand(cpi_amount_range) : nil]
     end
@@ -21,7 +21,7 @@ def generate_fake_clicks(company_id, ad_id, click_count, user_ips, ts_start, ts_
   count = Click.copy_from_client [:company_id, :ad_id, :clicked_at, :site_url, :user_ip, :user_data, :cost_per_click_usd] do |copy|
     click_count.times do |click_num|
       print "  -> Generating clicks: #{click_num}\r"
-      copy << [company_id, ad_id, Faker::Time.between(ts_start, ts_end), Faker::Internet.url, user_ips.sample,
+      copy << [company_id, ad_id, Faker::Time.between(from:ts_start, to:ts_end), Faker::Internet.url, user_ips.sample,
                { is_mobile: [true, false][rand(0..1)], location: Faker::Address.country_code },
                  cost_model == 'cost_per_click' ? rand(cpc_amount_range) : nil]
     end
@@ -48,20 +48,26 @@ namespace :test_data do
     ts_start = 6.months.ago
     ts_end   = Time.now
 
-    company_count_range    = 100..100
-    campaign_count_range   = 2..15
+    # company_count_range    = 100..100
+    company_count_range    = 3..3
+    # campaign_count_range   = 2..15
+    campaign_count_range   = 2..5
     ad_count_range         = 3..5
-    impression_count_range = 50_000..500_000
-    click_count_range      = 1..50_000
+    # impression_count_range = 50_000..500_000
+    impression_count_range = 100..200
+    # click_count_range      = 1..50_000
+    click_count_range      = 1..1000
 
     rand(company_count_range).times do
-      puts ''
+
 
       company = Company.create! name: Faker::Name.name, image_url: Faker::Avatar.image
+      puts "Company ##{company.id}"
       user = company.users.create! email: Faker::Internet.email, password: Faker::Internet.password
 
       MultiTenant.with(company) do
         rand(campaign_count_range).times do
+
           campaign = Campaign.create! name: Faker::Superhero.name,
                                       cost_model: ['cost_per_click', 'cost_per_impression'][rand(0..1)],
                                       state: ['paused', 'running', 'archived'][rand(0..2)],
@@ -72,9 +78,10 @@ namespace :test_data do
           domain_name = Faker::Internet.domain_name
 
           rand(ad_count_range).times do
-            ad = campaign.ads.create! name: Faker::Superhero.power, image_url: Faker::Placeholdit.image("600x100"),
-                                      target_url: Faker::Internet.url(domain_name)
-
+            print("test1")
+            ad = campaign.ads.create! name: Faker::Superhero.power, image_url: Faker::Placeholdit.image(size: "600x100"),
+                                      target_url: Faker::Internet.url(host: domain_name)
+            print("test2")
             puts "  Ad ##{ad.id}"
 
             generate_fake_data_for_ad ad,

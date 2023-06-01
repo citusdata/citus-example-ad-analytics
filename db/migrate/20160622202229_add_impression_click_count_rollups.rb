@@ -1,4 +1,4 @@
-class AddImpressionClickCountRollups < ActiveRecord::Migration
+class AddImpressionClickCountRollups < ActiveRecord::Migration[7.0]
   def up
     create_table :impression_daily_rollups, id: :uuid, partition_key: :company_id do |t|
       t.references :company, null: false
